@@ -1137,75 +1137,305 @@ def get_all_products(q):
     return products
 ```
 
-Let's try out the function by searching with several keywords.
-
-For example, we search for `Tuna` and get the total number of the product.
+Let's try out the function by searching with several keywords. We will search for `candy` and `coffee`.
 
 ```python
-tuna = get_all_products('Tuna')
-print(len(tuna))
-tuna
-```
-
-For example, we search for `Candy` and get the total number of the product.
-
-```python
-candy = get_all_products('Candy')
+candy = get_all_products('candy')
 print(len(candy))
 candy
 ```
 
-For example, we search for `Chocolate Chip` and get the total number of the product.
-
 ```python
-chocolate_chip = get_all_products('Chocolate Chip')
-print(len(chocolate_chip))
-chocolate_chip
+coffee = get_all_products('coffee')
+print(len(coffee))
+coffee
 ```
 
-For example, we search for `Tea Bag` and get the total number of the product.
-
 ```python
-tea_bag = get_all_products('Tea Bag')
-print(len(tea_bag))
-tea_bag
-```
-
-For example, we search for `sparkling water` and get the total number of the product.
-
-```python
-sparkling_water = get_all_products('sparkling water')
-print(len(sparkling_water))
-sparkling_water
+noodle = get_all_products('noodle')
+print(len(noodle))
+noodle
 ```
 
 # Data Processing and Cleaning
 
 The data collected previously are considered as raw data, we need to process and clean them before we can use them for analysis. We will use `pandas` to process the data and `matplotlib` to visualize the data.
 
+## Candy
+
+For the candy data, we will convert the list of dictionary into a `pandas` dataframe. We can use `pd.DataFrame()` to convert the list of dictionary into a `pd.DataFrame` and it could be shown as a table format in Jupyter Notebook.
+
 ```python
 import pandas as pd
 
-tuna_df = pd.DataFrame(tuna)
-tuna_df
-```
-
-```python
 candy_df = pd.DataFrame(candy)
 candy_df
 ```
 
+### View the Data
+
+To see the first 5 rows of the dataframe, we can use `head()` function.
+
 ```python
-chocolate_chip_df = pd.DataFrame(chocolate_chip)
-chocolate_chip_df
+candy_df.head()
+```
+
+To see the last 5 rows of the dataframe, we can use `tail()` function.
+
+```python
+candy_df.tail()
+```
+
+Let's check the data type of each column.
+
+```python
+candy_df.info()
+```
+
+```bash
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 350 entries, 0 to 349
+Data columns (total 22 columns):
+ #   Column   Non-Null Count  Dtype 
+---  ------   --------------  ----- 
+ 0   l        350 non-null    object
+ 1   c        350 non-null    object
+ 2   u        350 non-null    object
+ 3   p        350 non-null    object
+ 4   p_min    350 non-null    object
+ 5   p_max    350 non-null    object
+ 6   p_c      350 non-null    object
+ 7   p_min_c  350 non-null    object
+ 8   p_max_c  350 non-null    object
+ 9   d        350 non-null    object
+ 10  t        350 non-null    object
+ 11  t2       350 non-null    object
+ 12  f        350 non-null    int64 
+ 13  s        350 non-null    object
+ 14  sku      350 non-null    object
+ 15  p_spl    350 non-null    int64 
+ 16  id       350 non-null    object
+ 17  skus     350 non-null    object
+ 18  v_c      350 non-null    int64 
+ 19  iso      350 non-null    bool  
+ 20  vra      350 non-null    object
+ 21  vrc      350 non-null    object
+dtypes: bool(1), int64(3), object(18)
+memory usage: 33.2+ KB
+```
+
+### Convert Column Data Type
+
+The price column is in string format, thus it shows as `object` in the data type. We need to convert it into numeric format by using `astype()` function
+
+```python
+candy_df['p'] = candy_df['p'].astype(float)
+```
+
+Let's check the data type again.
+
+```python
+candy_df.info()
+```
+
+```bash
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 350 entries, 0 to 349
+Data columns (total 22 columns):
+ #   Column   Non-Null Count  Dtype  
+---  ------   --------------  -----  
+ 0   l        350 non-null    object 
+ 1   c        350 non-null    object 
+ 2   u        350 non-null    object 
+ 3   p        350 non-null    float64
+ 4   p_min    350 non-null    object 
+ 5   p_max    350 non-null    object 
+ 6   p_c      350 non-null    object 
+ 7   p_min_c  350 non-null    object 
+ 8   p_max_c  350 non-null    object 
+ 9   d        350 non-null    object 
+ 10  t        350 non-null    object 
+ 11  t2       350 non-null    object 
+ 12  f        350 non-null    int64  
+ 13  s        350 non-null    object 
+ 14  sku      350 non-null    object 
+ 15  p_spl    350 non-null    int64  
+ 16  id       350 non-null    object 
+ 17  skus     350 non-null    object 
+ 18  v_c      350 non-null    int64  
+ 19  iso      350 non-null    bool   
+ 20  vra      350 non-null    object 
+ 21  vrc      350 non-null    object 
+dtypes: bool(1), float64(1), int64(3), object(17)
+memory usage: 34.6+ KB
+```
+
+We can see that the data type of the price column has been changed to `float64`. After that, we can use `describe()` function to see the basic statistics of the numeric columns.
+
+```python
+candy_df.describe()
+```
+
+```bash
+                  p           f  p_spl    v_c
+count    350.000000  350.000000  350.0  350.0
+mean      41.380000         0.0    0.0    1.0
+std       59.607658         0.0    0.0    0.0
+min        5.000000         0.0    0.0    1.0
+25%       18.250000         0.0    0.0    1.0
+50%       26.000000         0.0    0.0    1.0
+75%       40.000000         0.0    0.0    1.0
+max      744.000000         0.0    0.0    1.0
+```
+
+### Cleaning up unnecessary data
+
+We could see that the data includes some Candle products, we need to remove them from the dataframe. We could do it by using `str.contains()` function to filter out the candle products and `~` to reverse the result.
+
+```python
+candy_df = candy_df[~candy_df['l'].str.lower().str.contains('candle')]
+```
+
+### Extract Data from Column
+
+When exploring the candy data, we found that there are some useful information in the `l` column, like types of candy, brand, and weight. We can extract the information and create new columns for them.
+
+Let's extract jelly from the `l` column and create a new dataframe with the extracted data.
+
+```python
+jelly_df = candy_df[candy_df['l'].str.lower().str.contains('jelly')]
+jelly_df
+```
+
+After that, we can use `describe()` function to see the basic statistics of the numeric columns.
+
+```python
+jelly_df.describe()
+```
+
+Let's extract gummy from the `l` column and create a new dataframe with the extracted data.
+
+```python
+gummy_df = candy_df[candy_df['l'].str.lower().str.contains('gummy')]
+gummy_df
+```
+
+After that, we can use `describe()` function to see the basic statistics of the numeric columns.
+
+```python
+gummy_df.describe()
+```
+
+## Coffee
+
+For the coffee data, we will convert the list of dictionary into a `pandas` dataframe. We can use `pd.DataFrame()` to convert the list of dictionary into a `pd.DataFrame` and it could be shown as a table format in Jupyter Notebook.
+
+```python
+coffee_df = pd.DataFrame(coffee)
+coffee_df
+```
+
+### Convert Column Data Type
+
+The price column is in string format, thus it shows as `object` in the data type. We need to convert it into numeric format by using `astype()` function
+
+```python
+coffee_df['p'] = coffee_df['p'].astype(float)
+```
+
+After that, we can use `describe()` function to see the basic statistics of the numeric columns.
+
+```python
+coffee_df.describe()
+```
+
+### Separate Tea and Coffee
+
+After we view the data, we found that there are some tea products in the coffee data. We need to remove them from the dataframe. We could do it by using `str.contains()` function to filter out the tea products and `~` to reverse the result.
+
+```python
+tea_df = coffee_df[coffee_df['l'].str.lower().str.contains('tea')]
+tea_df
+```
+
+After that, we can use `describe()` function to see the basic statistics of the numeric columns.
+
+```python
+tea_df.describe()
+```
+
+We could further extract the green tea products from the dataframe.
+
+```python
+green_tea_df = tea_df[tea_df['l'].str.lower().str.contains('green tea')]
+green_tea_df
+```
+
+After that, we can use `describe()` function to see the basic statistics of the numeric columns.
+
+```python
+green_tea_df.describe()
+```
+
+After that we could remove the tea products from the coffee dataframe.
+
+```python
+coffee_df = coffee_df[~coffee_df['l'].str.lower().str.contains('tea')]
+coffee_df
+```
+
+After that, we can use `describe()` function to see the basic statistics of the numeric columns.
+
+```python
+coffee_df.describe()
+```
+
+## Exercise 1: Noodle
+
+Please try to process the noodle data by yourself. You should initialize a `pd.DataFrame` name as `noodle_df` with the noodle data and convert the price column into numeric format.
+
+After that, you should extract the `udon` and `ramen` from the `l` column and create a new dataframe for each of them namely `udon_df` and `ramen_df`.
+
+# Fetch image data with URLs from `DataFrame`
+
+We can use `requests` to fetch the image data from the image url and save it into a file. We can use `shutil.copyfileobj` to shorten the code. You may need to create a folder named `images` in the same folder of the notebook.
+
+```bash
+!mkdir images
 ```
 
 ```python
-tea_bag_df = pd.DataFrame(tea_bag)
-tea_bag_df
+import requests
+import shutil
+
+def download_image(row):
+    dest = f'images/{row["sku"]}.jpg'
+    url = row['t']
+    print(f'downloading image for {row["l"]}')
+    with requests.get(url, stream=True) as r:
+        with open(dest, 'wb') as f:
+            shutil.copyfileobj(r.raw, f)
+    return row
 ```
 
+For example, we can use `apply()` function to apply the `download_image()` function to each row of the dataframe on `candy_df`. It would take some time to download all the images.
+
 ```python
-sparkling_water_df = pd.DataFrame(sparkling_water)
-sparkling_water_df
+candy_df.apply(download_image, axis=1)
 ```
+
+After that, we can use `matplotlib` to show the image. For example, we can show the first image in the dataframe with following code.
+
+```python
+from PIL import Image
+from IPython.display import display
+
+img = Image.open(f'images/{candy_df.iloc[0]["sku"]}.jpg')
+display(img)
+```
+
+![](images/301539080.jpg)
+
+## Exercise 2: Download the image for all dataframes
+
+Please try to download the image for all dataframes. You should download the image for `jelly_df`, `gummy_df`, `coffee_df`, `tea_df`, `udon_df`, and `ramen_df`.
