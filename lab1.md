@@ -1447,12 +1447,20 @@ After downloading the images, we can train a image classification model with the
 ## Load the image data as numpy array
 
 After we download the images, we can import the images into the dataframe. We can use `Image.open` function from `pillow` to open the image, convert to RGB image, and resize it afterward. We can use `np.array` to convert the image into a numpy array. After that, we can use `flatten()` to convert the 2D array into 1D array and use `tolist()` to convert the array into a list. We can use `random.choices` to randomly select 50 images from the dataframe.
+
+You may need to create a folder named `images` in the same folder of the notebook.
+
+```bash
+!mkdir images
+```
+
+Then we take the first 50 images from `jelly_df`.
+
 ```python
 from PIL import Image
 import numpy as np
-import random
 
-jelly_images = [np.array(Image.open(f'images/{sku}.jpg').convert('RGB').resize((240,240))).flatten().tolist() for sku in random.choices(jelly_df['sku'].tolist(), k=50)]
+jelly_images = [np.array(Image.open(f'images/{sku}.jpg').convert('RGB').resize((480,480))).flatten().tolist() for sku in jelly_df['sku'].tolist()[:50]]
 
 ```
 
@@ -1470,31 +1478,31 @@ jelly_images.shape
 Let's do the same thing for `gummy_df`, `coffee_df`, `tea_df`, `udon_df`, and `ramen_df` to create `jelly_images`, `gummy_images`, `coffee_images`, `tea_images`, `udon_images`, and `ramen_images`.
 
 ```python
-gummy_images = [np.array(Image.open(f'images/{sku}.jpg').convert('RGB').resize((240,240))).flatten().tolist() for sku in random.choices(gummy_df['sku'].tolist(), k=50)]
+gummy_images = [np.array(Image.open(f'images/{sku}.jpg').convert('RGB').resize((480,480))).flatten().tolist() for sku in gummy_df['sku'].tolist()[:50]]
 gummy_images = np.array(gummy_images)
 gummy_images.shape
 ```
 
 ```python
-coffee_images = [np.array(Image.open(f'images/{sku}.jpg').convert('RGB').resize((240,240))).flatten().tolist() for sku in random.choices(coffee_df['sku'].tolist(), k=50)]
+coffee_images = [np.array(Image.open(f'images/{sku}.jpg').convert('RGB').resize((480,480))).flatten().tolist() for sku in coffee_df['sku'].tolist()[:50]]
 coffee_images = np.array(coffee_images)
 coffee_images.shape
 ```
 
 ```python
-tea_images = [np.array(Image.open(f'images/{sku}.jpg').convert('RGB').resize((240,240))).flatten().tolist() for sku in random.choices(tea_df['sku'].tolist(), k=50)]
+tea_images = [np.array(Image.open(f'images/{sku}.jpg').convert('RGB').resize((480,480))).flatten().tolist() for sku in tea_df['sku'].tolist()[:50]]
 tea_images = np.array(tea_images)
 tea_images.shape
 ```
 
 ```python
-udon_images = [np.array(Image.open(f'images/{sku}.jpg').convert('RGB').resize((240,240))).flatten().tolist() for sku in random.choices(udon_df['sku'].tolist(), k=50)]
+udon_images = [np.array(Image.open(f'images/{sku}.jpg').convert('RGB').resize((480,480))).flatten().tolist() for sku in udon_df['sku'].tolist()[:50]]
 udon_images = np.array(udon_images)
 udon_images.shape
 ```
 
 ```python
-ramen_images = [np.array(Image.open(f'images/{sku}.jpg').convert('RGB').resize((240,240))).flatten().tolist() for sku in random.choices(ramen_df['sku'].tolist(), k=50)]
+ramen_images = [np.array(Image.open(f'images/{sku}.jpg').convert('RGB').resize((480,480))).flatten().tolist() for sku in ramen_df['sku'].tolist()[:50]]
 ramen_images = np.array(ramen_images)
 ramen_images.shape
 ```
