@@ -4,7 +4,7 @@
 
 # Overview
 
-Let's start with a brief introduction to data mining, the tools and the dataset we will be using in this lab.
+In this lab, we first have a brief introduction to data mining, the tools and the dataset. Then we will use Orange3 with Python script to perform data mining tasks, like association rule mining and mining frequent itemsets.
 
 ## Background
 
@@ -12,86 +12,111 @@ Data mining is the process of discovering patterns in large data sets involving 
 
 The overall goal of the data mining process is to extract information from a data set and transform it into an understandable structure for further use. Aside from the raw analysis step, it involves database and data management aspects, data pre-processing, model and inference considerations, interestingness metrics, complexity considerations, post-processing of discovered structures, visualization, and online updating. Data mining is the analysis step of the "knowledge discovery in databases" process (KDD).
 
-## Data Mining Tools: Orange3 in Python
+## Data Mining Tools in the Market
 
-In this series of labs, we will learn how to use the data mining tools in Orange to analyze datasets. Orange is a component-based data mining and machine learning software suite written in the Python Programming language. It features a visual programming front-end for explorative rapid qualitative data analysis and interactive data visualization. It allows user to create data analysis workflows, assemble and run them, and visualize the obtained data and intermediate results cooperatively with Python code. Making us write less code and focus on the data analysis.
+There are many data mining tools available in the market today. Some of them are free and open-source, while others are proprietary and commercial. Those tools could be used for data mining, machine learning, and data visualization without or with only minimal programming knowledge. They are used for business and commercial applications as well as for research, education, training, rapid prototyping, and application development and supports all steps of the machine learning process including data preparation, results visualization, model validation, and optimization
 
-It is a free software released under the terms of the GNU General Public License. Orange is cross-platform and works on Windows, macOS, and Linux. It can be installed in a **Python virtual environment** via `pip` package manager or `conda` package and environment manager.
+Let's take a look to some of the most popular data mining tools listed below.
 
-```bash
-pip install -U orange3
-```
+### [Orange](https://orange.biolab.si/)
 
-## Dataset: Amazon Review Data (2018)
+![Orange official website](https://url2png.hkbu.app/orange.biolab.si)
 
-Amazon review data (2018) is a large collection of reviews and metadata from Amazon products. The data is available on [Kaggle](https://www.kaggle.com/bittlingmayer/amazonreviews). The dataset contains 233.1 million reviews spanning May 1996 - Oct 2018. It contains reviews and metadata from Amazon, including 142.8 million reviews spanning May 1996 - July 2014 for various products like books, electronics, movies, etc. This dataset is a slightly cleaned-up version of the data available at [https://cseweb.ucsd.edu/~jmcauley/datasets/amazon_v2/](https://cseweb.ucsd.edu/~jmcauley/datasets/amazon_v2/).
+Orange is a component-based data mining and machine learning software suite written in the Python programming language. It features a visual programming front-end for explorative rapid qualitative data analysis and interactive data visualization. It allows users to create data analysis workflows, assemble and run them, and visualize the obtained data and intermediate results cooperatively with Python code. Orange is free software released under the terms of the GNU General Public License. Orange is cross-platform and works on Windows, macOS, and Linux. It can be installed in a Python virtual environment via pip package manager or conda package and environment manager.
+
+
+### [RapidMiner](https://rapidminer.com/)
+
+![RapidMiner official website](https://url2png.hkbu.app/rapidminer.com)
+
+RapidMiner is a data science software platform developed by the company of the same name that provides an integrated environment for data preparation, machine learning, deep learning, text mining, and predictive analytics. It is used for business and commercial applications as well as for research, education, training, rapid prototyping, and application development and supports all steps of the machine learning process including data preparation, results visualization, model validation, and optimization.
+
+### [Weka](https://www.cs.waikato.ac.nz/ml/weka/)
+
+![Weka official website](https://url2png.hkbu.app/www.cs.waikato.ac.nz/ml/weka)
+
+Weka is a Java based tools and collection of machine learning algorithms for data mining tasks. It contains tools for data preparation, classification, regression, clustering, association rules mining, and visualization. Found only on the islands of New Zealand, the Weka is a flightless bird with an inquisitive nature. The name is pronounced like this, and the bird sounds like this. Weka is open-source software issued under the GNU General Public License.
+
+### [KNIME](https://www.knime.com/)
+
+![KNIME official website](https://url2png.hkbu.app/www.knime.com)
+
+KNIME is a free and open-source data analytics, reporting, and integration platform. KNIME integrates various components for machine learning and data mining through its modular data pipelining concept. A graphical user interface and use of JDBC allows assembly of nodes blending different data sources, including preprocessing (ETL: Extraction, Transformation, Loading), for modeling, data analysis, and visualization without, or with only minimal, programming. To some extent as advanced analytics tool KNIME can be considered as a SAS alternative.
 
 ---
 
 # Data Mining with Orange
 
-Let's move on to the data mining part of this lab. We will be using Orange3 to analyze the Amazon Review Data (2018) dataset.
+As Python is the most popular programming language for data science, we will be using Orange3 for data mining in this lab. By combining the flexibility of Python with the power of Orange and its rich ecosystem of add-ons, using Orange3 for data mining is a great choice for beginners and experienced data scientists alike and is free and open-source software released under the terms of the GNU General Public License (GPLv3) with a dual license model that allows for the software to be used for free for non-commercial purposes, while requiring a license for commercial purposes and for the development of add-ons.
+
+Let's move on to the data mining part of this lab. We will first get familiar with Orange3 and then we will load the dataset into Orange3 and perform some data mining tasks, like association rule mining and mining frequent itemsets.
+
+## Installation
+
+Orange a free software released under the terms of the GNU General Public License. Orange is cross-platform and works on Windows, macOS, and Linux. It can be installed in a **Python virtual environment** via `pip` package manager or `conda` package and environment manager.
+
+```bash
+pip install -U Orange3
+```
 
 ## Getting Started
 
-Let's start by opening Orange3 and creating a new workflow. We will be using the Amazon Review Data (2018) dataset. You can download the dataset from [https://cseweb.ucsd.edu/~jmcauley/datasets/amazon_v2/](https://cseweb.ucsd.edu/~jmcauley/datasets/amazon_v2/). The dataset is available in json format. We will be using the `Magazine_Subscriptions.json.gz` file.
+Let's start by opening Orange3 and creating a new workflow.
 
-After that, we will need to decompress the file. You can use the `gunzip` command to decompress the file in Linux or macOS. For Windows, you can use [7-Zip](https://www.7-zip.org/) to decompress the file.
+![Screenshot here]()
 
-```bash
-gunzip Magazine_Subscriptions.json.gz
-```
 
-## Loading the Dataset
 
-Let's start by loading the dataset into Orange3. We will be using the `File` widget to load the dataset. The `File` widget allows us to load a dataset from a file. We can also use the `URL` widget to load a dataset from a URL. We will be using the `File` widget to load the dataset from the `reviews_Electronics.json.gz` file.
 
-We will need a Python Script widget to load the dataset into Orange3. Please create a new Python Script widget with following code.
+# Frequent Itemset Mining and Association Rule Mining
+
+## Dataset: Amazon Review Data (2018)
+
+Amazon review data (2018) is a large collection of reviews and metadata from Amazon products. The dataset contains 233.1 million reviews spanning May 1996 - Oct 2018. It contains reviews and metadata from Amazon, including 142.8 million reviews spanning May 1996 - July 2014 for various products like books, electronics, movies, etc. This dataset is a slightly cleaned-up version of the data available at [https://cseweb.ucsd.edu/~jmcauley/datasets/amazon_v2/](https://cseweb.ucsd.edu/~jmcauley/datasets/amazon_v2/). The dataset is available in json format. We will be using the `Movies_and_TV_5.json.gz` file.
+
+## Downloading the Dataset and Loading it into Orange3
+
+We will need a Python Script widget to load the dataset from web into Orange3. Please create a new Python Script widget with following code.
 
 ```python
-from Orange.data import Table, Domain, ContinuousVariable, DiscreteVariable, StringVariable
+from Orange.data import Table
 import gzip
 import json
+import requests
+import pandas as pd
 
-domain = Domain([
-    ContinuousVariable("overall"),
-    ContinuousVariable("verified"),
-    ContinuousVariable("unixReviewTime")
-], metas=[
-    StringVariable("reviewTime"),
-    StringVariable("reviewerID"),
-    StringVariable("asin"),
-    StringVariable("style"),
-    StringVariable("reviewerName"),
-    StringVariable("reviewText"),
-    StringVariable("summary")
-])
+def download_file(url):
+    local_filename = url.split('/')[-1]
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        with open(local_filename, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+    return local_filename
 
-arr = []
-meta = []
 
-with gzip.open('Magazine_Subscriptions.json.gz', 'rb') as f:
+download_file('https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_v2/categoryFilesSmall/Movies_and_TV_5.json.gz')
+
+
+df = pd.DataFrame()
+with gzip.open('Magazine_Subscriptions_5.json.gz', 'rb') as f:
+    itemset = set()
     for line in f:
         record = json.loads(line)
-        if record['verified']:
-            record['verified'] = 1
-        else:
-            record['verified'] = -1
+        row = pd.DataFrame([{
+            'reviewerID': record['reviewerID'],
+            'asin': record['asin'],
+        }])
+        df = pd.concat([df, row], ignore_index=True)
 
-        if 'style' in record.keys():
-            record['style'] = record['style']['Format:']
-        else:
-            record['style'] = 'None'
+def export(x):
+    with open('output.basket', 'a+b') as f:
+        dataline = f"{df.at[x.index[0], 'reviewerID']}=1, {'=1,'.join(x.tolist())}=1\n"
+        f.write(dataline.encode('utf-8'))
+    return ','.join(x.tolist())
 
-        if 'reviewText' not in record.keys():
-            record['reviewText'] = ''
-        if 'summary' not in record.keys():
-            record['summary'] = ''
-        if 'reviewerName' not in record.keys():
-            record['reviewerName'] = ''
+df.groupby(by='reviewerID').agg(export)
 
-        arr.append([record['overall'], record['verified'], record['unixReviewTime']])
-        meta.append([record['reviewTime'], record['reviewerID'], record['asin'], record['style'], record['reviewerName'], record['reviewText'], record['summary']])
-
-out_data = Table.from_numpy(domain, arr, metas=meta)
+out_data = Table.from_file('output.basket')
 ```
+
