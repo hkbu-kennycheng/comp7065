@@ -66,13 +66,37 @@ Let's start by opening Orange3 and creating a new workflow.
 ![Screenshot here]()
 
 
-
-
 # Frequent Itemset Mining and Association Rule Mining
+
+## Install Orange3-Associate
+
+Orange3-Associate is an add-on for Orange3 that provides a widget for frequent itemset mining and association rule mining. It is available on PyPI and can be installed with pip.
+
+```bash
+pip install Orange3-Associate
+```
 
 ## Dataset: Amazon Review Data (2018)
 
 Amazon review data (2018) is a large collection of reviews and metadata from Amazon products. The dataset contains 233.1 million reviews spanning May 1996 - Oct 2018. It contains reviews and metadata from Amazon, including 142.8 million reviews spanning May 1996 - July 2014 for various products like books, electronics, movies, etc. This dataset is a slightly cleaned-up version of the data available at [https://cseweb.ucsd.edu/~jmcauley/datasets/amazon_v2/](https://cseweb.ucsd.edu/~jmcauley/datasets/amazon_v2/). The dataset is available in json format. We will be using the `Movies_and_TV_5.json.gz` file.
+
+Let's take a look at the dataset.
+
+```json
+{
+  "reviewerID": "A2SUAM1J3GNN3B",
+  "asin": "0000013714",
+  "reviewerName": "J. McDonald",
+  "helpful": [2, 3],
+  "reviewText": "I bought this for my husband who plays the piano. He is having a wonderful time playing these old hymns. The music is at times hard to read because we think the book was published for singing from more than playing from. Great purchase though!",
+  "overall": 5.0,
+  "summary": "Heavenly Highway Hymns",
+  "unixReviewTime": 1252800000,
+  "reviewTime": "09 13, 2009"
+}
+```
+
+Since we are interested in mining frequent itemsets and association rules, we will only need the `reviewerID` and `asin` fields. The `reviewerID` field is the ID of the reviewer and the `asin` field is the ID of the product. We will be using these two fields to mine frequent itemsets and association rules.
 
 ## Downloading the Dataset and Loading it into Orange3
 
@@ -99,7 +123,7 @@ download_file('https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_v2/catego
 
 
 df = pd.DataFrame()
-with gzip.open('Magazine_Subscriptions_5.json.gz', 'rb') as f:
+with gzip.open('Movies_and_TV_5.json.gz', 'rb') as f:
     itemset = set()
     for line in f:
         record = json.loads(line)
@@ -119,4 +143,10 @@ df.groupby(by='reviewerID').agg(export)
 
 out_data = Table.from_file('output.basket')
 ```
+
+## Mining Frequent Itemsets
+
+We will be using the `Frequent Itemsets` widget to mine frequent itemsets. Please connect the `Python Script` widget to the `Frequent Itemsets` widget and run the workflow. You will see the following output.
+
+![Screenshot here]()
 
