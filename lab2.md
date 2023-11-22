@@ -45,7 +45,7 @@ KNIME is a free and open-source data analytics, reporting, and integration platf
 
 ---
 
-# Data Mining with Orange
+# Data Mining with Orange3
 
 As Python is the most popular programming language for data science, we will be using Orange3 for data mining in this lab. By combining the flexibility of Python with the power of Orange and its rich ecosystem of add-ons, using Orange3 for data mining is a great choice for beginners and experienced data scientists alike and is free and open-source software released under the terms of the GNU General Public License (GPLv3) with a dual license model that allows for the software to be used for free for non-commercial purposes, while requiring a license for commercial purposes and for the development of add-ons.
 
@@ -59,12 +59,31 @@ Orange a free software released under the terms of the GNU General Public Licens
 pip install -U Orange3
 ```
 
-## Getting Started
+## Getting Started 
 
-Let's start by opening Orange3 and creating a new workflow.
+Let's start by opening Orange3 and creating a new workflow. Please open Orange3 and create a new workflow with `File` -> `New` -> `Workflow` or `Ctrl + N`, or simply click the `New` button on the Welcome screen.
 
-![Screenshot here]()
+![](lab2-images/orange3-new-workflow.png)
 
+## Loading Data in Orange3
+
+Orange3 can load data from a variety of sources, including CSV files, Excel files, SQL databases, and online data sources. We will be using the `File` widget to load the dataset from web into Orange3.
+
+![](lab2-images/orange3-file-widget.png)
+
+Please select `iris.tab` from `File` select box close the dialog.
+
+## Viewing Data in Orange3
+
+Orange3 can display data in a variety of ways, including tables, scatter plots, and bar charts. We will be using the `Data Table` widget to view the dataset in Orange3.
+
+![](lab2-images/orange3-data-table-widget.png)
+
+## Filtering Data in Orange3
+
+Orange3 can filter data in a variety of ways, including selecting columns, selecting rows, and selecting values. We will be using the `Select Rows` widget to filter the dataset in Orange3.
+
+![](lab2-images/orange3-select-rows-widget.png)
 
 # Frequent Itemset Mining and Association Rule Mining
 
@@ -98,7 +117,28 @@ Let's take a look at the dataset.
 
 Since we are interested in mining frequent itemsets and association rules, we will only need the `reviewerID` and `asin` fields. The `reviewerID` field is the ID of the reviewer and the `asin` field is the ID of the product. We will be using these two fields to mine frequent itemsets and association rules.
 
-## Downloading the Dataset and Loading it into Orange3
+## Data scraping with Python script
+
+After knowing the dataset, we will download the dataset from web and load it into Orange3 with Python Script. We will be using the `Python Script` widget to load the dataset from web into Orange3.
+
+### Python Script Widget
+
+Python Script widget allows you to run Python scripts from within Orange. It can be used to load the dataset from web into Orange3. We could create a new script with `+` button and edit the script in the widget. The script can be run by clicking the `Run Script` button. The script can be saved by clicking the `Save Script` button.
+
+![Python Script Widget screenshot](lab2-images/python-script-widget.png)
+
+A script is an actual Python function named `python_script`. It could accept input with a widget connected to the input of the Python Script widget. In that case, there would be one argument to the function, `in_data`.
+
+![](lab2-images/python-script-widget-input.png)
+
+It could output data with a widget connected to the output of the Python Script widget. The output consists of a dictionary with keys `out_data`, `out_learner`, `outout_classifier` and `out_object`.
+
+- `out_data` is a data table of type [`Orange.data.Table`](https://orange3.readthedocs.io/projects/orange-data-mining-library/en/latest/reference/data.table.html)
+- `out_learner` is a learner of type [`Orange.classification.Learner`](https://orange3.readthedocs.io/projects/orange-data-mining-library/en/latest/reference/classification.html)
+- `out_classifier` is a classifier of type [`Orange.classification.Classifier`](https://orange3.readthedocs.io/projects/orange-data-mining-library/en/latest/reference/classification.html)
+- `out_object` is an arbitrary Python object, that allow you to pass any data to other widgets
+
+### Loading the Dataset from Web into Orange3
 
 We will need a Python Script widget to load the dataset from web into Orange3. Please create a new Python Script widget with following code.
 
@@ -108,6 +148,8 @@ import gzip
 import json
 import requests
 import pandas as pd
+
+json_url = 'https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_v2/categoryFilesSmall/AMAZON_FASHION_5.json.gz'
 
 def download_file(url):
     local_filename = url.split('/')[-1]
@@ -119,11 +161,11 @@ def download_file(url):
     return local_filename
 
 
-download_file('https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_v2/categoryFilesSmall/Movies_and_TV_5.json.gz')
+download_file(json_url)
 
 
 df = pd.DataFrame()
-with gzip.open('Movies_and_TV_5.json.gz', 'rb') as f:
+with gzip.open(json_url.split('/')[-1], 'rb') as f:
     itemset = set()
     for line in f:
         record = json.loads(line)
@@ -150,3 +192,12 @@ We will be using the `Frequent Itemsets` widget to mine frequent itemsets. Pleas
 
 ![Screenshot here]()
 
+### Find the most frequent itemsets
+
+The `Frequent Itemsets` widget can be used to find the most frequent itemsets. The widget can be configured to find the most frequent itemsets with a minimum support of 0.01. The widget will output the most frequent itemsets with a minimum support of 0.01.
+
+![Screenshot here]()
+
+### Exercies: Find the most frequent itemsets with a minimum support of 0.05
+
+Please configure the `Frequent Itemsets` widget to find the most frequent itemsets with a minimum support of 0.05. The widget will output the most frequent itemsets with a minimum support of 0.05.
