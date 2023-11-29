@@ -264,6 +264,6 @@ Please configure the `Association Rules` widget to find the association rules wi
 
 In order to interpret the frequent itemsets and association rules, we will need to download the products metadata from web. We will be using the `Python Script` widget to download the products metadata from web into Orange3.
 
-# Exercise: Apply the frequent itemset and association rule mining to one of the category in Amazon review data (2018)
+# Exercise: Frequent itemset and association rule mining for another category in Amazon review data
 
 Please try to apply what we have learn in today's lab to another category in Amazon review data (2018) and try to interpret the result.
