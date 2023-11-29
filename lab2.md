@@ -1,4 +1,4 @@
-# Lab 2: Data Mining
+# Lab 2: Data Mining - Frequent Itemset Mining and Association Rule Mining
 
 ---
 
@@ -59,6 +59,12 @@ Orange a free software released under the terms of the GNU General Public Licens
 pip install -U Orange3
 ```
 
+After that, we can run Orange3 with following command.
+
+```bash
+orange-canvas
+```
+
 ## Getting Started 
 
 Let's start by opening Orange3 and creating a new workflow. Please open Orange3 and create a new workflow with `File` -> `New` -> `Workflow` or `Ctrl + N`, or simply click the `New` button on the Welcome screen.
@@ -67,37 +73,76 @@ Let's start by opening Orange3 and creating a new workflow. Please open Orange3 
 
 ## Loading Data in Orange3
 
-Orange3 can load data from a variety of sources, including CSV files, Excel files, SQL databases, and online data sources. We will be using the `File` widget to load the dataset from web into Orange3.
+Orange3 can load data from a variety of sources, including CSV files, Excel files, SQL databases, and online data sources. We will be using the `Datasets` widget to load the dataset from web into Orange3.
 
-![](lab2-images/orange3-file-widget.png)
+![screenshot here](lab2-images/orange3-datasets-widget.png)
 
-Please select `iris.tab` from `File` select box close the dialog.
+Please search for `Foodmart` in the widget panel and double-click to load it into Orange3.
 
 ## Viewing Data in Orange3
 
 Orange3 can display data in a variety of ways, including tables, scatter plots, and bar charts. We will be using the `Data Table` widget to view the dataset in Orange3.
 
-![](lab2-images/orange3-data-table-widget.png)
+![screenshot here](lab2-images/orange3-data-table-widget.png)
+
+Please connect the `Datasets` widget to the `Data Table` widget and run the workflow to generate above output.
 
 ## Filtering Data in Orange3
 
 Orange3 can filter data in a variety of ways, including selecting columns, selecting rows, and selecting values. We will be using the `Select Rows` widget to filter the dataset in Orange3.
 
-![](lab2-images/orange3-select-rows-widget.png)
+Please connect the `Data Table` widget to the `Select Rows` widget, we will need to configure the connection to send all data to the `Select Rows` widget for filtering. Please double-click the connection and connect `Data` to `Data`, instead of `Selected Data` to `Data`.
+
+![](lab2-images/orange3-select-rows-widget-connection.png)
+
+After that, we will need to configure the `Select Rows` widget to select transaction with `Milk`. Please double-click the `Select Rows` widget and configure it to select rows with `Milk` greater than `0`.
+
+![select rows widget](lab2-images/orange3-select-rows-widget-configuration.png)
+
+You may connect the `Select Rows` widget to the `Data Table` widget to view the filtered dataset.
+
+![select rows output](lab2-images/orange3-select-rows-widget-output.png)
+
 
 # Frequent Itemset Mining and Association Rule Mining
 
+Frequent itemset mining is a data mining task to find frequent itemsets and association rules in a transaction database. It identifies the frequent individual items in a database and extends them to larger itemsets. The frequent itemsets determined by frequent itemset mining can be used to determine association rules which highlight general trends in the database. These rules can be used to identify products that are frequently bought together. For example, people who buy bread and eggs also tend to buy butter as well. Frequent itemset mining is usually used to mine association rules.
+
 ## Install Orange3-Associate
 
-Orange3-Associate is an add-on for Orange3 that provides a widget for frequent itemset mining and association rule mining. It is available on PyPI and can be installed with pip.
+Orange3-Associate is an add-on for Orange3 that provides a widget for frequent itemset mining and association rule mining. It is available on top menu bar `Options` > `Add-ons` > `Filter...`. Search with `Associate`, check it and click on `Install`.
+
+![](lab2-images/orange3-associate-install.png)
+
+It can also be installed with following command.
 
 ```bash
 pip install Orange3-Associate
 ```
 
-## Dataset: Amazon Review Data (2018)
+## Frequent Itemset Mining with Orange3-Associate
 
-Amazon review data (2018) is a large collection of reviews and metadata from Amazon products. The dataset contains 233.1 million reviews spanning May 1996 - Oct 2018. It contains reviews and metadata from Amazon, including 142.8 million reviews spanning May 1996 - July 2014 for various products like books, electronics, movies, etc. This dataset is a slightly cleaned-up version of the data available at [https://cseweb.ucsd.edu/~jmcauley/datasets/amazon_v2/](https://cseweb.ucsd.edu/~jmcauley/datasets/amazon_v2/). The dataset is available in json format. We will be using the `Movies_and_TV_5.json.gz` file.
+We will be using the `Frequent Itemsets` widget to mine frequent itemsets. Please connect the previous `Datasets` widget with `Foodmart` data to the `Frequent Itemsets` widget, and configure the widget to mine frequent itemsets with a minimum support of `0.1`. After clicking on ``, the widget will output the most frequent itemsets with a minimum support of `0.1`.
+
+Minimum support is the minimum number of transactions that include an itemset. For example, the minimum support of `0.1` means that the itemset must appear in at least `10%` of the transactions.
+
+![](lab2-images/orange3-associate-frequent-itemsets.png)
+
+You may also filter the frequent itemsets with a keyword like `Milk` to find the frequent itemsets with `Milk`.
+
+## Association Rule Mining with Orange3-Associate
+
+We will be using the `Association Rules` widget to mine association rules. Please connect the previous `Datasets` widget with `Foodmart` data to the `Association Rules` widget, and configure the widget to mine association rules with a minimum support of `0.01` and a minimum confidence of `90%`. After clicking on `Find Items`, the widget will output the association rules with a minimum support of `0.01` and a minimum confidence of `90%`.
+
+Confidence is the ratio of the number of transactions that include all items in the consequent as well as the antecedent over the number of transactions that include all items in the antecedent. For example, the confidence of the association rule `Milk -> Butter` is `0.9`, which means that `90%` of the transactions that include `Milk` also include `Butter`.
+
+![](lab2-images/orange3-associate-association-rules.png)
+
+Antecedent is the itemset on the left side of the arrow, and consequent is the itemset on the right side of the arrow. For example, the association rule `Milk -> Butter` means that people who buy `Milk` also tend to buy `Butter`.
+
+# Case Study: Amazon Review Data (2018)
+
+Amazon review data (2018) is a large collection of reviews and metadata from Amazon products. The dataset contains 233.1 million reviews spanning May 1996 - Oct 2018. It contains reviews and metadata from Amazon, including 142.8 million reviews spanning May 1996 - July 2014 for various products like books, electronics, movies, etc. This dataset is a slightly cleaned-up version of the data available at [https://cseweb.ucsd.edu/~jmcauley/datasets/amazon_v2/](https://cseweb.ucsd.edu/~jmcauley/datasets/amazon_v2/). The dataset is available in json format. We will be using the [`All_Beauty_5.json.gz`](https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_v2/categoryFilesSmall/All_Beauty_5.json.gz) file.
 
 Let's take a look at the dataset.
 
@@ -127,7 +172,8 @@ Python Script widget allows you to run Python scripts from within Orange. It can
 
 ![Python Script Widget screenshot](lab2-images/python-script-widget.png)
 
-A script is an actual Python function named `python_script`. It could accept input with a widget connected to the input of the Python Script widget. In that case, there would be one argument to the function, `in_data`.
+A script is an actual Python function named `python_script`. It could accept input with a widget connected to the input of the Python Script widget. In that case, there would be one argument to the function named `in_data`. It's a data table of type [`Orange.data.Table`](https://orange3.readthedocs.io/projects/orange-data-mining-library/en/latest/reference/data.table.html).
+
 
 ![](lab2-images/python-script-widget-input.png)
 
@@ -138,7 +184,7 @@ It could output data with a widget connected to the output of the Python Script 
 - `out_classifier` is a classifier of type [`Orange.classification.Classifier`](https://orange3.readthedocs.io/projects/orange-data-mining-library/en/latest/reference/classification.html)
 - `out_object` is an arbitrary Python object, that allow you to pass any data to other widgets
 
-### Loading the Dataset from Web into Orange3
+### Loading the Review Dataset from URL into Orange3
 
 We will need a Python Script widget to load the dataset from web into Orange3. Please create a new Python Script widget with following code.
 
@@ -149,7 +195,7 @@ import json
 import requests
 import pandas as pd
 
-json_url = 'https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_v2/categoryFilesSmall/AMAZON_FASHION_5.json.gz'
+json_url = 'https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_v2/metaFiles2/meta_All_Beauty.json.gz'
 
 def download_file(url):
     local_filename = url.split('/')[-1]
@@ -186,18 +232,38 @@ df.groupby(by='reviewerID').agg(export)
 out_data = Table.from_file('output.basket')
 ```
 
-## Mining Frequent Itemsets
+In above code, we download the top-5 most reviewed products [`All_Beauty_5.json.gz`](https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_v2/categoryFilesSmall/All_Beauty_5.json.gz) file by the `download_file` function. This function we have used in the previous lab. We then open the gzipped file and parse the json file line by line. We then extract the `reviewerID` and `asin` fields from the json file and store them in a Pandas `DataFrame`.
 
-We will be using the `Frequent Itemsets` widget to mine frequent itemsets. Please connect the `Python Script` widget to the `Frequent Itemsets` widget and run the workflow. You will see the following output.
+After that, we load the dataset into a Pandas DataFrame and export it to a file named `output.basket`. The dataset file format is in the basket format. Here is an example of the previous `Foodmart` dataset from [https://datasets.biolab.si/core/foodmart.basket](https://datasets.biolab.si/core/foodmart.basket). 
 
-![Screenshot here]()
+```csv
+Fresh Vegetables=3, Milk=3, Plastic Utensils=2, Soup, STORE_ID_2
+Cheese=2, Deodorizers, Hard Candy=2, Jam=2, STORE_ID_2
+Fresh Vegetables=2, STORE_ID_2
+Cleaners, Cookies=2, Eggs=2, Preserves, STORE_ID_2
+Cheese=2, Nasal Sprays=2, Soup, STORE_ID_2
+Dips, Jelly=3, Tofu, STORE_ID_2
+Cookies=2, Dips, Preserves, STORE_ID_2
+Cereal=2, Cleaners=2, Deli Meats=2, Fresh Vegetables, Rice, STORE_ID_2
+Flavored Drinks, French Fries=2, Jelly, Soup, Spices, STORE_ID_2
+```
 
-### Find the most frequent itemsets
+The basket format is a text file with one transaction per line. Each transaction is a list of items separated by commas. The first item in each transaction is the transaction ID. The rest of the items are the items in the transaction. The items are separated by commas. The transaction ID and the items are separated by `=`. The `output.basket` file is the input of the `Frequent Itemsets` widget and the `Association Rules` widget.
 
-The `Frequent Itemsets` widget can be used to find the most frequent itemsets. The widget can be configured to find the most frequent itemsets with a minimum support of 0.01. The widget will output the most frequent itemsets with a minimum support of 0.01.
+## Exercise: Frequent Itemset and Association Rule
 
-![Screenshot here]()
-
-### Exercies: Find the most frequent itemsets with a minimum support of 0.05
+### Find the most frequent itemsets with a minimum support of 0.05
 
 Please configure the `Frequent Itemsets` widget to find the most frequent itemsets with a minimum support of 0.05. The widget will output the most frequent itemsets with a minimum support of 0.05.
+
+### Find the association rules with a minimum support of 0.01 and a minimum confidence of 90%
+
+Please configure the `Association Rules` widget to find the association rules with a minimum support of 0.01 and a minimum confidence of 90%. The widget will output the association rules with a minimum support of 0.01 and a minimum confidence of 90%.
+
+## Download products metadata
+
+In order to interpret the frequent itemsets and association rules, we will need to download the products metadata from web. We will be using the `Python Script` widget to download the products metadata from web into Orange3.
+
+# Exercise: Apply the frequent itemset and association rule mining to one of the category in Amazon review data (2018)
+
+Please try to apply what we have learn in today's lab to another category in Amazon review data (2018) and try to interpret the result.
