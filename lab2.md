@@ -45,7 +45,11 @@ KNIME is a free and open-source data analytics, reporting, and integration platf
 
 ---
 
-# Data Mining with Orange3
+# Case Study: Foodmart Dataset
+
+Food Mart is a grocery store chain that has stores in many cities across the United States. Foodmart dataset is a dataset of transactions from the grocery store. It contains 2,000 transactions with 1,000 items. It is available in the basket format from [https://datasets.biolab.si/core/foodmart.basket](https://datasets.biolab.si/core/foodmart.basket). It's a text file with one transaction per line. Each transaction is a list of items separated by commas. The first item in each transaction is the transaction ID. The rest of the items are the items in the transaction. The items are separated by commas. The transaction ID and the items are separated by `=`.
+
+## Data Mining with Orange3
 
 As Python is the most popular programming language for data science, we will be using Orange3 for data mining in this lab. By combining the flexibility of Python with the power of Orange and its rich ecosystem of add-ons, using Orange3 for data mining is a great choice for beginners and experienced data scientists alike and is free and open-source software released under the terms of the GNU General Public License (GPLv3) with a dual license model that allows for the software to be used for free for non-commercial purposes, while requiring a license for commercial purposes and for the development of add-ons.
 
@@ -140,7 +144,7 @@ Confidence is the ratio of the number of transactions that include all items in 
 
 Antecedent is the itemset on the left side of the arrow, and consequent is the itemset on the right side of the arrow. For example, the association rule `Milk -> Butter` means that people who buy `Milk` also tend to buy `Butter`.
 
-# Case Study: Amazon Review Data (2018)
+# Exploratory exercise: Amazon Review Data (2018)
 
 Amazon review data (2018) is a large collection of reviews and metadata from Amazon products. The dataset contains 233.1 million reviews spanning May 1996 - Oct 2018. It contains reviews and metadata from Amazon, including 142.8 million reviews spanning May 1996 - July 2014 for various products like books, electronics, movies, etc. This dataset is a slightly cleaned-up version of the data available at [https://cseweb.ucsd.edu/~jmcauley/datasets/amazon_v2/](https://cseweb.ucsd.edu/~jmcauley/datasets/amazon_v2/). The dataset is available in json format. We will be using the [`All_Beauty_5.json.gz`](https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_v2/categoryFilesSmall/All_Beauty_5.json.gz) file.
 
@@ -164,7 +168,7 @@ Since we are interested in mining frequent itemsets and association rules, we wi
 
 ## Data scraping with Python script
 
-After knowing the dataset, we will download the dataset from web and load it into Orange3 with Python Script. We will be using the `Python Script` widget to load the dataset from web into Orange3.
+After knowing the dataset, we will download the dataset from web and load it into Orange3 with Python Script. We will be using the `Python Script` widget to load the dataset from web into Orange3. Let's create a new workflow and add a `Python Script` widget to the workflow.
 
 ### Python Script Widget
 
@@ -184,9 +188,9 @@ It could output data with a widget connected to the output of the Python Script 
 - `out_classifier` is a classifier of type [`Orange.classification.Classifier`](https://orange3.readthedocs.io/projects/orange-data-mining-library/en/latest/reference/classification.html)
 - `out_object` is an arbitrary Python object, that allow you to pass any data to other widgets
 
-### Loading the Review Dataset from URL into Orange3
+### Loading the products metadata from URL into Orange3
 
-We will need a Python Script widget to load the dataset from web into Orange3. Please create a new Python Script widget with following code.
+We will need a Python Script widget to load the products metadata from web into Orange3. Please create a new Python Script widget with following code.
 
 ```python
 from Orange.data import Table
@@ -206,12 +210,60 @@ def download_file(url):
                 f.write(chunk)
     return local_filename
 
-
 download_file(json_url)
 
+filename = json_url.split('/')[-1]
 
 df = pd.DataFrame()
-with gzip.open(json_url.split('/')[-1], 'rb') as f:
+with gzip.open(filename, 'rb') as f:
+    itemset = set()
+    for line in f:
+        record = json.loads(line)
+        row = pd.DataFrame([{
+            'asin': record['asin'],
+            'title': record['title'],
+            'description': record['description'],
+            'price': record['price'],
+            'brand': record['brand']
+        }])
+        df = pd.concat([df, row], ignore_index=True)
+df.to_csv(f'{filename}.csv', index=False)
+
+out_data = Table.from_file(f'{filename}.csv')
+```
+
+We could than connect the `Python Script` widget to the `Data Table` widget to view the products' metadata. Or further connect the `Data Table` widget to the `Select Rows` widget to filter the products' metadata.
+
+![](lab2-images/orange3-products-metadata.png)
+
+### Loading the Review Dataset for Top-5 Most Reviewed Products from URL into Orange3
+
+We will need a Python Script widget to load the dataset from web into Orange3. Please create a new Python Script widget with following code.
+
+```python
+from Orange.data import Table
+import gzip
+import json
+import requests
+import pandas as pd
+
+json_url = 'https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_v2/categoryFilesSmall/All_Beauty_5.json.gz'
+
+def download_file(url):
+    local_filename = url.split('/')[-1]
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        with open(local_filename, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+    return local_filename
+
+
+download_file(json_url)
+filename = json_url.split('/')[-1]
+
+df = pd.DataFrame()
+with gzip.open(filename, 'rb') as f:
     itemset = set()
     for line in f:
         record = json.loads(line)
@@ -222,14 +274,14 @@ with gzip.open(json_url.split('/')[-1], 'rb') as f:
         df = pd.concat([df, row], ignore_index=True)
 
 def export(x):
-    with open('output.basket', 'a+b') as f:
+    with open(f'{filename}.basket', 'a+b') as f:
         dataline = f"{df.at[x.index[0], 'reviewerID']}=1, {'=1,'.join(x.tolist())}=1\n"
         f.write(dataline.encode('utf-8'))
     return ','.join(x.tolist())
 
 df.groupby(by='reviewerID').agg(export)
 
-out_data = Table.from_file('output.basket')
+out_data = Table.from_file(f'{filename}.basket')
 ```
 
 In above code, we download the top-5 most reviewed products [`All_Beauty_5.json.gz`](https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_v2/categoryFilesSmall/All_Beauty_5.json.gz) file by the `download_file` function. This function we have used in the previous lab. We then open the gzipped file and parse the json file line by line. We then extract the `reviewerID` and `asin` fields from the json file and store them in a Pandas `DataFrame`.
@@ -250,20 +302,14 @@ Flavored Drinks, French Fries=2, Jelly, Soup, Spices, STORE_ID_2
 
 The basket format is a text file with one transaction per line. Each transaction is a list of items separated by commas. The first item in each transaction is the transaction ID. The rest of the items are the items in the transaction. The items are separated by commas. The transaction ID and the items are separated by `=`. The `output.basket` file is the input of the `Frequent Itemsets` widget and the `Association Rules` widget.
 
-## Exercise: Frequent Itemset and Association Rule
+## Exercise: Find the most frequent itemsets with a minimum support of 0.05
 
-### Find the most frequent itemsets with a minimum support of 0.05
+Please configure the `Frequent Itemsets` widget to find the most frequent itemsets with a minimum support of `0.1`.
 
-Please configure the `Frequent Itemsets` widget to find the most frequent itemsets with a minimum support of 0.05. The widget will output the most frequent itemsets with a minimum support of 0.05.
+## Exercise: Find the association rules with a minimum support of 0.01 and a minimum confidence of 90%
 
-### Find the association rules with a minimum support of 0.01 and a minimum confidence of 90%
+Please configure the `Association Rules` widget to find the association rules with a minimum support of `1%` and a minimum confidence of 90%.
 
-Please configure the `Association Rules` widget to find the association rules with a minimum support of 0.01 and a minimum confidence of 90%. The widget will output the association rules with a minimum support of 0.01 and a minimum confidence of 90%.
+## Exercise: Filter out products with the generated association rule's antecedent
 
-## Download products metadata
-
-In order to interpret the frequent itemsets and association rules, we will need to download the products metadata from web. We will be using the `Python Script` widget to download the products metadata from web into Orange3.
-
-# Exercise: Frequent itemset and association rule mining for another category in Amazon review data
-
-Please try to apply what we have learn in today's lab to another category in Amazon review data (2018) and try to interpret the result.
+Please configure the `Select Rows` widget to filter out products with the generated association rule's antecedent.
