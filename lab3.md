@@ -32,9 +32,9 @@ In this lab, you will use similarity matching to find similar movies in the Movi
 
 The MovieLens dataset contains 100,000 ratings from 943 users on 1,682 movies. The dataset can be downloaded from [here](https://files.grouplens.org/datasets/movielens/ml-100k.zip). The dataset contains the following files:
 
-- `u.data`: The full dataset, 100,000 ratings by 943 users on 1,682 movies.
+- `u.data`: The full dataset in tab separated format, 100,000 ratings by 943 users on 1,682 movies.
 - `u.info`: The number of users, items, and ratings in the dataset.
-- `u.item`: Information about the 1,682 movies. This is a tab separated list of:
+- `u.item`: Information about the 1,682 movies. This is a pipe separated list of:
   - movie id
   - movie title
   - release date
@@ -68,9 +68,9 @@ The MovieLens dataset contains 100,000 ratings from 943 users on 1,682 movies. T
   - zip code
 - `u.occupation`: A list of the occupations.
 
-## Loading the Dataset into Orange3
+## Download and extract the Dataset
 
-Let's load the dataset into Orange3.
+Let's download the dataset and extract it with `Python script` widget in Orange3. Please create a new workflow and add a `Python script` widget. Then, copy and paste the following code into the `Python script` widget.
 
 ```python
 import requests
@@ -91,9 +91,95 @@ download_file(zip_url)
 filename = zip_url.split('/')[-1]
 
 with ZipFile(filename, 'r') as zipObj:
-   # Extract all the contents of zip file in current directory
    zipObj.extractall()
 
 ```
 
-First, download the dataset from [here](http://files.grouplens.org/datasets/movielens/ml-100k.zip). Then, unzip the dataset and open the `u.data` file in Orange3. The `u.data` file contains the full dataset, 100,000 ratings by 943 users on 1,682 movies. The `u.data` file is a tab separated list of:
+The above script will download the dataset and extract it in the current directory. You can check the current directory by clicking on the `File` menu and select `Open Folder`. You should see the `ml-100k` folder in the current directory.
+
+## Load the Dataset
+
+After download and extracted the dataset, let's load the dataset into Orange3. Please add a `Python script` widget with the following code. Then add a `Data Table` widget and connect the `Python script` widget to the `Data Table` widget.
+
+```python
+from Orange.data import Domain, DiscreteVariable, Table, StringVariable
+import pandas as pd
+
+filename = 'ml-100k/u.item'
+
+tags = [
+    'unknown',
+    'Action',
+    'Adventure',
+    'Animation',
+    "Children's",
+    'Comedy',
+    'Crime',
+    'Documentary',
+    'Drama',
+    'Fantasy',
+    'Film-Noir',
+    'Horror',
+    'Musical',
+    'Mystery',
+    'Romance',
+    'Sci-Fi',
+    'Thriller',
+    'War',
+    'Western'
+]
+
+columns = [
+    'id',
+    'title',
+    'release',
+    'video',
+    'url',
+]
+
+domain = Domain([DiscreteVariable.make(t) for t in tags],
+                metas=[StringVariable(c) for c in columns])
+df = pd.DataFrame(columns=columns+tags)
+
+with open(filename, 'rb') as f:
+    for i, line in enumerate(f):
+        df.loc[i] = line.decode("ISO-8859-1").strip().split('|')
+
+df[tags] = df[tags].astype(str)
+df[columns] = df[columns].astype(str)
+
+df.to_csv('u.item.csv', index=False)
+out_data = Table.from_file('u.item.csv')
+```
+
+The above script will load the `u.item` file in `ml-100k` folder into Orange3 as `Table` and see the following output in the `Data Table` widget.
+
+![](lab3/images/load_dataset.png)
+
+## Data preprocessing
+
+Some of the columns in the dataset are not useful for finding similar movies. For example, the `id` column is just an identifier for the movie. The `title` column contains the title of the movie. The `release` column contains the release date of the movie. The `video` column contains the video release date of the movie. The `url` column contains the IMDb URL of the movie. These columns are not useful for finding similar movies. Therefore, we will remove these columns from the dataset.
+
+![screenshot](lab3/images/select_columns.png)
+
+The `Select Columns` widget will remove `id`, `title`, `release`, `video`, and `url` columns from the dataset and keep all other columns.
+
+## Calculate the distance
+
+To calculate the distance between two movies, we need to convert the dataset into a format that can be used by the similarity matching algorithms. The `Distance` widget will convert the dataset into a format that can be used by the similarity matching algorithms. The `Distance` widget will calculate the distance between  movies.
+
+![screenshot](lab3/images/distance.png)
+
+The default distance function is Euclidean distance with values normalized to the range [0, 1]. The Euclidean distance is the square root of the sum of the squared differences between two vectors. The Euclidean distance is the most commonly used distance metric. The Euclidean distance is defined as follows:
+
+![](https://wikimedia.org/api/rest_v1/media/math/render/svg/1b935b612b2b2d24214510aaa2b6a98a3e202f84)
+
+## Visualize the result
+
+It's hard to visualize the distance between two movies. Therefore, we will use the `Distance Matrix` widget to visualize the distance between two movies. The `Distance Matrix` widget will calculate the distance between all pairs of movies and visualize the distance between two movies.
+
+![screenshot](lab3/images/distance_matrix.png)
+
+It will show all pairs of movies and the distance between movies in the dataset. We could also visualize the distance matrix using the `Distance Map` widget.
+
+![screenshot](lab3/images/distance_map.png)
