@@ -4,7 +4,7 @@
 
 # Overview
 
-In this lab, you will learn how to use the similarity matching techniques to find similar items in a dataset. You will try out different distance metrics and similarity measures to find similar items in a dataset. To order to work with a real-world dataset, you will learn how to convert a dataset into a format that can be used by the similarity matching algorithms.
+In this lab, you will learn how to use Orange3 to find similar movies in the MovieLens dataset. You will also learn how to convert a dataset into a format that can be used by the similarity matching widget.
 
 ## Background
 
@@ -28,7 +28,9 @@ After completing this lab, you should be able to:
 
 # Case Study: Movie Recommendation
 
-In this lab, you will use similarity matching to find similar movies in the MovieLens dataset. Let's take a look at the MovieLens 100k dataset README on [https://files.grouplens.org/datasets/movielens/ml-100k-README.txt](files.grouplens.org/datasets/movielens/ml-100k-README.txt).
+In this lab, you will use similarity matching to find similar movies in the MovieLens dataset. Let's take a look at the MovieLens 100k dataset README on [https://files.grouplens.org/datasets/movielens/ml-100k-README.txt](https://files.grouplens.org/datasets/movielens/ml-100k-README.txt).
+
+![](https://url2png.hkbu.app/files.grouplens.org/datasets/movielens/ml-100k-README.txt)
 
 The MovieLens dataset contains 100,000 ratings from 943 users on 1,682 movies. The dataset can be downloaded from [here](https://files.grouplens.org/datasets/movielens/ml-100k.zip). The dataset contains the following files:
 
@@ -148,11 +150,18 @@ with open(filename, 'rb') as f:
 df[tags] = df[tags].astype(str)
 df[columns] = df[columns].astype(str)
 
+for i, m in enumerate(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']):
+  if i < 9:
+    df['release'] = df['release'].str.replace(m, '0'+str(i+1))
+  else:
+    df['release'] = df['release'].str.replace(m, str(i+1))
+df['release'] = df['release'].str.replace('-','/')
+
 df.to_csv('u.item.csv', index=False)
 out_data = Table.from_file('u.item.csv')
 ```
 
-The above script will load the `u.item` file in `ml-100k` folder into Orange3 as `Table` and see the following output in the `Data Table` widget.
+The above script will load the `u.item` file in `ml-100k` folder into Orange3 as `Table` and see the following output in the `Data Table` widget. We also do data cleaning in the above script. For example, we convert the release date to the format `MM/DD/YYYY` which could be recognized by Orange3.
 
 ![](lab3/images/load_dataset.png)
 

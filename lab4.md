@@ -1,6 +1,10 @@
-# Lab3: House Price Prediction (Part 1) with Orange3
+# Lab3: Regression
 
 ---
+
+# Overview
+
+In this lab, you will learn how to use Orange3 for regression problems. You will learn how to use different regression algorithms to predict the Boston house price. You will also learn how to evaluate the performance of a regression model.
 
 ## Introduction
 

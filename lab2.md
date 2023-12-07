@@ -302,7 +302,7 @@ Flavored Drinks, French Fries=2, Jelly, Soup, Spices, STORE_ID_2
 
 The basket format is a text file with one transaction per line. Each transaction is a list of items separated by commas. The first item in each transaction is the transaction ID. The rest of the items are the items in the transaction. The items are separated by commas. The transaction ID and the items are separated by `=`. The `output.basket` file is the input of the `Frequent Itemsets` widget and the `Association Rules` widget.
 
-## Exercise: Find the most frequent itemsets with a minimum support of 0.05
+## Exercise: Find the most frequent itemsets with a minimum support of `0.1`
 
 Please configure the `Frequent Itemsets` widget to find the most frequent itemsets with a minimum support of `0.1`.
 
