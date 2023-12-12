@@ -178,18 +178,9 @@ After making predictions, we usually want to evaluate the performance of the mod
 
 ![](lab4/images/test-and-score.png)
 
-
-## Evaluating the model
-
-To evaluate the performance of the model using cross validation and different evaluation metrics, we can use the `Test & Score` widget. The `Test & Score` widget can be found in the `Evaluate` category. The `Test & Score` widget evaluates the performance of a model on a data set. The `Test & Score` widget outputs a data table with the predicted values and the actual values.
-
-![](images/lr-test-and-score.gif)
-
-### Cross validation
+### K-fold cross validation
 
 Cross validation is a technique that is used to evaluate the performance of a model. Cross validation is used to estimate how well a model will perform on unseen data. Cross validation is used to reduce the risk of overfitting a model.
-
-## K-fold cross validation
 
 K-fold cross validation is a type of cross validation. K-fold cross validation is used to evaluate the performance of a model. K-fold cross validation is used to estimate how well a model will perform on unseen data. K-fold cross validation is used to reduce the risk of overfitting a model.
 
