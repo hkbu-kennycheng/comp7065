@@ -165,9 +165,15 @@ The above script will load the `u.item` file in `ml-100k` folder into Orange3 as
 
 ![](lab3/images/load_dataset.png)
 
+*Remarks:*
+- The date format from the script is `DD/MM/YYYY` instead of `MM/DD/YYYY` when I run the script. But the `Edit Domain` widget will recognize the date format as `MM/DD/YYYY` only
+
 ## Data preprocessing
 
 The `release` column contains the release date of the movie. It could be converted to a `Date` column using the `Edit Domain` widget. Please add an `Edit Domain` widget and connect the `Data Table` widget to the `Edit Domain` widget. Then, click on the `Edit Domain` widget and select the `release` column. Then, change the `Type` to `Time` and click on the `Apply` button. It would also generate a new column `Selected` with `Yes` and `No` values.
+
+*Remarks:*
+- No `Selected` column is generated
 
 ![](lab3/images/edit_domain.png)
 

@@ -313,3 +313,7 @@ Please configure the `Association Rules` widget to find the association rules wi
 ## Exercise: Filter out products with the generated association rule's antecedent
 
 Please configure the `Select Rows` widget to filter out products with the generated association rule's antecedent.
+
+*Remarks:*
+- Use the ID found in the antecedent of the association rule to match the products' ID and display the products' title, description, price and brand in the `Data Table` widget.
+- select the consequent of the association rule

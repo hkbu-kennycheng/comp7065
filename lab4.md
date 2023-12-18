@@ -1,5 +1,4 @@
-# Lab3: Regression
-
+# Lab4: Regression
 ---
 
 # Overview
@@ -133,9 +132,12 @@ We may check `Visualize numeric values` to display the distribution of each attr
 
 ### Distributions
 
-We can use the `Distributions` widget to explore the distribution of each attribute. The `Distributions` widget displays the distribution of each attribute in the dataset. It displays the distribution of each attribute in a histogram. It also displays the mean, median, standard deviation, and other statistics of each attribute.
+We can use the `Distributions` widget to explore the distribution of each attribute. The `Distributions` widget displays the distribution of each attribute in the dataset. It displays the distribution of each attribute in a histogram. It also displays the mean and standard deviation of each attribute.
 
-Please connect the `File` widget to the `Distributions` widget. The `Distributions` widget will display the distribution of each attribute in the dataset. It displays the distribution of each attribute in a histogram. It also displays the mean, median, standard deviation, and other statistics of each attribute.
+Please connect the `File` widget to the `Distributions` widget. The `Distributions` widget will display the distribution of each attribute in the dataset.
+
+*Remarks:*
+- only mean and standard deviation are shown
 
 ![](lab4/images/distributions.png)
 
@@ -209,5 +211,8 @@ The following table shows the formulas for these metrics:
 | MSE    | ![MSE = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2](https://mathjax2svg.hkbu.app/MSE%3D%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%28y_i-%5Chat%7By%7Di%29%5E2)                                                                                       |
 | RMSE   | ![RMSE = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}](https://mathjax2svg.hkbu.app/RMSE%3D%5Csqrt%7B%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%28y_i-%5Chat%7By%7D_i%29%5E2%7D)                                                                 |
 | R2     | ![R^2 = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y})^2}](https://mathjax2svg.hkbu.app/R%5E2%3D1-%5Cfrac%7B%5Csum_%7Bi%3D1%7D%5E%7Bn%7D(y_i-%5Chat%7By%7D_i)%5E2%7D%7B%5Csum_%7Bi%3D1%7D%5E%7Bn%7D(y_i-%5Cbar%7By%7D)%5E2%7D) |
+
+*Remarks:*
+- Use 5-fold for cross validation? Default setting
 
 # Exercises: 
