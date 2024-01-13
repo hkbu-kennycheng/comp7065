@@ -241,7 +241,7 @@ def get_all_products(q):
     return products
 ```
 
-Let's try out the function by searching with several keywords. We will search for `candy` and `coffee`.
+Let's try out the function by searching with several keywords. We will search for `candy`, `coffee` and `noodle`.
 
 ```python
 candy = get_all_products('candy')
@@ -505,7 +505,7 @@ After that, you should extract the `udon` and `ramen` from the `l` column and cr
 We can use `requests` to fetch the image data from the image url and save it into a file. We can use `shutil.copyfileobj` to shorten the code. You may need to create a folder named `images` in the same folder of the notebook.
 
 ```bash
-!mkdir images
+!mkdir -p images
 ```
 
 ```python
@@ -569,9 +569,9 @@ jelly_images = [np.array(Image.open(f'images/{sku}.jpg').convert('RGB').resize((
 ```
 
 *Remarks:*
-- the above code does not resize the images to 224x224 pixels as specified. 
+- the above code does not resize the images to 480x480 pixels as specified. 
 
-After that, we got a numpy array with 50 images with 224x224 pixels.
+After that, we got a numpy array with 50 images with 480x480 pixels.
 
 ```python
 jelly_images = np.array(jelly_images)
@@ -661,21 +661,6 @@ predicted
 We can use `matplotlib` to show the image with the prediction result. We can use `subplots` to create a figure with 4 columns and 1 row. We can use `zip` to loop through the axes, images, and prediction result. We can use `set_axis_off` to hide the axis. We can use `imshow` to show the image. We can use `set_title` to set the title of the image.
 
 ```python
-_, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
-for ax, image, prediction in zip(axes, X_test, predicted):
-    ax.set_axis_off()
-    ax.imshow(image.reshape(240,240, 3))
-    ax.set_title(f"Prediction: {prediction}")
-```
-
-*Remarks:*
-- `matplotlib` was never imported in the previous sections
-- an error occurred from a mismatch in the dimensions when I was trying to reshape the image. The image data is originally flattened from a 480x480 image (or resize to 224x224), but the reshape function is trying to reshape it into a 240x240 image.
-- the prediction was showing the label {0, 1, 2, 3, 4, 5} instead of the label name {jelly, gummy, coffee, tea, udon, ramen}
-
-Here is my updated code:
-
-```python
 import matplotlib.pyplot as plt
 
 _, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
@@ -698,3 +683,7 @@ clf.score(X_test, y_test)
 ```text
 0.43333333333333335
 ```
+
+## Discussion and discovery exercises
+
+The accuracy of the model is 43.3%. This is not a very good score. This is not surprising, since the model is very simple and the dataset is very small. How could we improve the accuracy of the model? Please try to implement your ideas as exercise.
