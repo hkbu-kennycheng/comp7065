@@ -1,4 +1,4 @@
-# Lab1: Data scraping and cleaning
+# Lab1: Data scraping, cleaning and modeling
 
 ---
 
