@@ -91,6 +91,10 @@ Orange3 can display data in a variety of ways, including tables, scatter plots, 
 
 Please connect the `Datasets` widget to the `Data Table` widget and run the workflow to generate above output.
 
+It would be great to check out the statistics of the data. Please connect the `Feature statistics` widget to the `Data Table` widget and run the workflow to generate above output.
+
+![](lab2-images/orange3-feature-stats.png)
+
 ## Filtering Data in Orange3
 
 Orange3 can filter data in a variety of ways, including selecting columns, selecting rows, and selecting values. We will be using the `Select Rows` widget to filter the dataset in Orange3.
@@ -312,8 +316,4 @@ Please configure the `Association Rules` widget to find the association rules wi
 
 ## Exercise: Filter out products with the generated association rule's antecedent
 
-Please configure the `Select Rows` widget to filter out products with the generated association rule's antecedent.
-
-*Remarks:*
-- Use the ID found in the antecedent of the association rule to match the products' ID and display the products' title, description, price and brand in the `Data Table` widget.
-- select the consequent of the association rule
+Please configure the `Select Rows` widget to filter out products with the generated association rule's antecedent. You may need to use the ID found in the antecedent of the association rule to match the products' ID and display the products' title, description, price and brand in the `Data Table` widget.
