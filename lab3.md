@@ -257,6 +257,31 @@ Another way to visualize the distance between movies is to use the `MDS` widget.
 
 You will need to increase the jitter in the `MDS` widget settings to see the points in the scatter plot. You may mouse-over the points in the scatter plot to see the movie title. The `MDS` widget will visualize the distance between movies in a scatter plot. The distance between movies is calculated using the corresponding distance function.
 
+### Find similar movies with Python script
+
+In this section, we will use the `Python script` widget to find similar movies. Please add a `Python script` widget and connect the `Select Columns` widget to the `Python script` widget. Then, copy and paste the following code into the `Python script` widget.
+
+```python
+from Orange.data import Table
+import numpy as np
+
+print(len(in_datas[0]), len(in_datas[1]))
+
+index = int(in_datas[1].metas[0][0])
+matrix_row = in_object[index].copy()
+print(index, matrix_row[index-1:index+2])
+matrix_row[index] = np.inf # mask itself
+print(index, matrix_row[index], np.argmin(matrix_row))
+
+out_data = Table.from_table(in_datas[0].domain, in_datas[0], np.array([index, np.argmin(matrix_row)]) - 1)
+```
+
+You will also need to crate a new `Data Table` widget for select movie that you want to find similar movies. Then, connect the `Python script` widget to the `Data Table` widget. The `Python script` widget will find similar movies for the selected movie.
+
+It accepts two data inputs, one it the full data from `Data Table` widget and another one is the selected data from `Data Table` widget.
+
+![](lab3/python-script-min-dist.png)
+
 # Exercise: Find similar products in the Amazon dataset
 
-In this exercise, we will re-use the Amazon dataset from Lab 2. 
+In this exercise, we will re-use the Amazon dataset from Lab 2 and generate a similarity matrix for the dataset. Then, we will use the similarity matrix to find similar products in the dataset. You may select another category for this exercise from the Amazon dataset and apply the same steps to find similar products in the dataset.
