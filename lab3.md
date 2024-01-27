@@ -273,13 +273,17 @@ import numpy as np
 
 print(len(in_datas[0]), len(in_datas[1]))
 
-index = int(in_datas[1].metas[0][0])
-matrix_row = in_object[index].copy()
-print(index, matrix_row[index-1:index+2])
-matrix_row[index] = np.inf # mask itself
-print(index, matrix_row[index], np.argmin(matrix_row))
+index = int(in_datas[0].metas[0][0])-1
 
-out_data = Table.from_table(in_datas[0].domain, in_datas[0], np.array([index, np.argmin(matrix_row)]) - 1)
+matrix_row = in_object[index].copy()
+matrix_row[index] = np.inf # mask itself
+target_index = np.argmin(matrix_row)
+
+out_data = Table.from_table(
+    in_datas[0].domain,
+    in_datas[1],
+    np.array([index, target_index])
+)
 ```
 
 You will also need to crate a new `Data Table` widget for select movie that you want to find similar movies. Then, connect the `Python script` widget to the `Data Table` widget. The `Python script` widget will find similar movies for the selected movie.
