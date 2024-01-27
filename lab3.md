@@ -157,6 +157,15 @@ for i, m in enumerate(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', '
     df['release'] = df['release'].str.replace(m, str(i+1))
 df['release'] = df['release'].str.replace('-','/')
 
+def swapdaymon(value):
+    n = str(value).split('/')
+    print(n)
+    if len(n)==3:
+        return f'{n[1]}/{n[0]}/{n[2]}'
+    return ''
+
+df['release'] = df['release'].apply(swapdaymon)
+
 df.to_csv('u.item.csv', index=False)
 out_data = Table.from_file('u.item.csv')
 ```
@@ -164,9 +173,6 @@ out_data = Table.from_file('u.item.csv')
 The above script will load the `u.item` file in `ml-100k` folder into Orange3 as `Table` and see the following output in the `Data Table` widget. We also do data cleaning in the above script. For example, we convert the release date to the format `MM/DD/YYYY` which could be recognized by Orange3.
 
 ![](lab3/images/load_dataset.png)
-
-*Remarks:*
-- The date format from the script is `DD/MM/YYYY` instead of `MM/DD/YYYY` when I run the script. But the `Edit Domain` widget will recognize the date format as `MM/DD/YYYY` only
 
 ## Data preprocessing
 
