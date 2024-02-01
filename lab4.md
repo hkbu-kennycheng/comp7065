@@ -191,6 +191,8 @@ K-fold cross validation is a type of cross validation. K-fold cross validation i
 
 ![](https://scikit-learn.org/stable/_images/grid_search_cross_validation.png)
 
+By default, the `Test & Score` widget uses 5-fold cross validation to evaluate the performance of a model. The `Test & Score` widget outputs the performance of the model.
+
 ### Evaluation Metrics
 
 There are different metrics that can be used to evaluate the performance of a regression model. The most common metrics are mean absolute error (MAE), mean squared error (MSE), root mean squared error (RMSE) and R2 score.
@@ -208,11 +210,8 @@ The following table shows the formulas for these metrics:
 | Metric | Formula                                                                                                                                                                                                                                                    |
 |--------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | MAE    | ![](https://mathjax2svg.hkbu.app/'MAE%3D%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%7Cy_i-%5Chat%7By%7D_i%7C)                                                                                                                                        |
-| MSE    | ![MSE = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2](https://mathjax2svg.hkbu.app/MSE%3D%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%28y_i-%5Chat%7By%7Di%29%5E2)                                                                                       |
-| RMSE   | ![RMSE = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}](https://mathjax2svg.hkbu.app/RMSE%3D%5Csqrt%7B%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%28y_i-%5Chat%7By%7D_i%29%5E2%7D)                                                                 |
+| MSE    | ![](https://mathjax2svg.hkbu.app/MSE%3D%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%28y_i-%5Chat%7By%7Di%29%5E2)                                                                                       |
+| RMSE   | ![](https://mathjax2svg.hkbu.app/RMSE%3D%5Csqrt%7B%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%28y_i-%5Chat%7By%7D_i%29%5E2%7D)                                                                 |
 | R2     | ![R^2 = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y})^2}](https://mathjax2svg.hkbu.app/R%5E2%3D1-%5Cfrac%7B%5Csum_%7Bi%3D1%7D%5E%7Bn%7D(y_i-%5Chat%7By%7D_i)%5E2%7D%7B%5Csum_%7Bi%3D1%7D%5E%7Bn%7D(y_i-%5Cbar%7By%7D)%5E2%7D) |
-
-*Remarks:*
-- Use 5-fold for cross validation? Default setting
 
 # Exercises: 
