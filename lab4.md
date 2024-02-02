@@ -191,7 +191,7 @@ K-fold cross validation is a type of cross validation. K-fold cross validation i
 
 ![](https://scikit-learn.org/stable/_images/grid_search_cross_validation.png)
 
-By default, the `Test & Score` widget uses 5-fold cross validation to evaluate the performance of a model. The `Test & Score` widget outputs the performance of the model.
+By default, the `Test & Score` widget uses 5-fold cross-validation to evaluate the performance of a model. The `Test & Score` widget outputs the performance of the model.
 
 ### Evaluation Metrics
 
@@ -214,4 +214,23 @@ The following table shows the formulas for these metrics:
 | RMSE   | ![](https://mathjax2svg.hkbu.app/RMSE%3D%5Csqrt%7B%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%28y_i-%5Chat%7By%7D_i%29%5E2%7D)                                                                 |
 | R2     | ![R^2 = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y})^2}](https://mathjax2svg.hkbu.app/R%5E2%3D1-%5Cfrac%7B%5Csum_%7Bi%3D1%7D%5E%7Bn%7D(y_i-%5Chat%7By%7D_i)%5E2%7D%7B%5Csum_%7Bi%3D1%7D%5E%7Bn%7D(y_i-%5Cbar%7By%7D)%5E2%7D) |
 
-# Exercises: 
+# Exploratory Exercises: Traffic prediction of Major Roads in Hong Kong
+
+In this exercise, you will learn how to use Orange3 to predict the traffic volume of major roads in Hong Kong.
+
+## Dataset
+
+We will the [Real-time Traffic Speed, Volume and Road Occupancy of Major roads](https://data.gov.hk/en-data/dataset/hk-td-sm_4-traffic-data-strategic-major-roads) dataset from the Hong Kong government. It contains the real-time traffic speed, volume and road occupancy of major roads in Hong Kong. The dataset contains the following attributes:
+
+- `date`: The date of the record
+- `period_from`, `period_to`: The period of the record
+- `detector_id`: The unique identifier of the detector
+- `direction`: The direction of the traffic
+- `lane_id`: The name of the lane
+  - With 4 lanes, the lane names are `Fast Lane`, `Middle Lane 2`, `Middle Lane 1` and `Slow Lane`
+  - With 3 lanes, the lane names are `Fast Lane`, `Middle Lane` and `Slow Lane`
+  - With 2 lanes, the lane names are `Fast Lane` and `Slow Lane`
+- `speed`: The speed of the traffic in km/h
+- `occupancy`: The road occupancy in percentage (%)
+- `volume`: The traffic volume
+- `sd`: The standard deviation of the speed
