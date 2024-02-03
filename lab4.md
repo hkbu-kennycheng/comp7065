@@ -239,7 +239,16 @@ The dataset we use is [Real-time Traffic Speed, Volume and Road Occupancy of Maj
 
 ## Fetching data: Single-threaded program vs Multi-threaded program
 
+In order to process XML file with BeautifulSoup, you need to install the `beautifulsoup4` package. You can install the package by running the following command in the terminal.
+
+```bash
+conda install anaconda::lxml
+conda install anaconda::beautifulsoup4
+```
+
 Here is a python code snippet to fetch the data from the Hong Kong government website with their API. Please create a new Python script widget and copy the following code into the widget.
+
+```bash
 
 ```python
 from Orange.data import Table
