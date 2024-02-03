@@ -216,11 +216,13 @@ The following table shows the formulas for these metrics:
 
 # Exploratory Exercises: Traffic prediction of Major Roads in Hong Kong
 
-In this exercise, you will learn how to use Orange3 to predict the traffic volume of major roads in Hong Kong.
+In this exercise, you will learn how to use Orange3 to predict the traffic volume of major roads in Hong Kong. There are numerous vehicles speed detector installed on the major roads in Hong Kong. The detectors collect the real-time traffic speed, volume and road occupancy of major roads in Hong Kong. You may take a look to this [link](https://portal.csdi.gov.hk/geoportal/?datasetId=td_rcd_1671693191724_92214&lang=en) for detail location of the detectors and its ID.
+
+We could predict the traffic volume of a particular road by using the traffic speed, road occupancy at the same time of another road. If the road is connected, their traffic data should be correlated. We could use the traffic data of one road to predict the traffic data of another road. Please try out a few detectors and see if the traffic data of one road can be used to predict the traffic data of another road.
 
 ## Dataset
 
-We will the [Real-time Traffic Speed, Volume and Road Occupancy of Major roads](https://data.gov.hk/en-data/dataset/hk-td-sm_4-traffic-data-strategic-major-roads) dataset from the Hong Kong government. It contains the real-time traffic speed, volume and road occupancy of major roads in Hong Kong. The dataset contains the following attributes:
+The dataset we use is [Real-time Traffic Speed, Volume and Road Occupancy of Major roads](https://data.gov.hk/en-data/dataset/hk-td-sm_4-traffic-data-strategic-major-roads) from the Hong Kong government. It contains the real-time traffic speed, volume and road occupancy of major roads in Hong Kong. The dataset contains the following attributes:
 
 - `date`: The date of the record
 - `period_from`, `period_to`: The period of the record
@@ -234,3 +236,143 @@ We will the [Real-time Traffic Speed, Volume and Road Occupancy of Major roads](
 - `occupancy`: The road occupancy in percentage (%)
 - `volume`: The traffic volume
 - `sd`: The standard deviation of the speed
+
+## Fetching data: Single-threaded program vs Multi-threaded program
+
+Here is a python code snippet to fetch the data from the Hong Kong government website with their API. Please create a new Python script widget and copy the following code into the widget.
+
+```python
+from Orange.data import Table
+import pandas as pd
+import requests
+import urllib.parse
+from bs4 import BeautifulSoup
+
+url = 'https://resource.data.one.gov.hk/td/traffic-detectors/rawSpeedVol-all.xml'
+
+columns = ['from', 'to', 'detector_id', 'direction', 'lane_id', 'speed', 'occupancy', 'volume', 'sd']
+
+def get_urls(url, start, end):
+    u = f'https://api.data.gov.hk/v1/historical-archive/list-file-versions?url={urllib.parse.quote_plus(url)}&start={start}&end={end}'
+    r = requests.get(u)
+    return [
+        f'https://api.data.gov.hk/v1/historical-archive/get-file?url={urllib.parse.quote_plus(url)}&time={t}'
+        for t in r.json()['timestamps']
+    ]
+
+
+def get_df(u):
+    r = requests.get(u)
+    soup = BeautifulSoup(r.text, features="xml")
+    date = soup.find('date').get_text()
+    d = pd.DataFrame(columns=columns)
+    for period in soup.find_all('period'):
+        for detector in period.find_all('detector'):
+            for lane in detector.find_all('lane'):
+                period_from = pd.to_datetime(f'{date} {period.find("period_from").get_text()}')
+                period_to = pd.to_datetime(f'{date} {period.find("period_to").get_text()}')
+                row = pd.DataFrame([[
+                    period_from,
+                    period_to,
+                    detector.find("detector_id").get_text(),
+                    detector.find("direction").get_text(),
+                    lane.find("lane_id").get_text(),
+                    int(lane.find('speed').get_text()),
+                    int(lane.find('occupancy').get_text()),
+                    int(lane.find('volume').get_text()),
+                    float(lane.find('s.d.').get_text())
+                ]], columns=columns)
+                d = pd.concat([d, row], ignore_index=True)
+    return d
+
+
+urls = get_urls(url, '20240122', '20240126')
+df = pd.DataFrame(columns=columns)
+
+for u in urls:
+    df = pd.concat([df, get_df(u)], ignore_index=True)
+
+out_data = Table.from_pandas_dfs(df[['speed', 'occupancy', 'volume', 'sd']],df[[]],df[['from', 'to', 'detector_id', 'direction', 'lane_id']])
+```
+
+The above code would take a very long time to fetch the data, since it is a single-threaded program. We have also prepared a dataset for you. You can download the dataset from [here](https://gist.githubusercontent.com/hkbu-kennycheng/556e46dba59dccdc254b0ac0f24af6c3/raw/d73870173775e32c08ba8823c72d0dd3775eea51/lab4-20240122-20240126.csv).
+
+### Fetching data with multi-threaded program
+
+For a multithreaded version, please create a new file named `fetch_data.py` and copy the following code into the file.
+
+```python
+import pandas as pd
+import requests
+import urllib.parse
+from bs4 import BeautifulSoup
+import concurrent.futures
+from tqdm import tqdm
+
+url = 'https://resource.data.one.gov.hk/td/traffic-detectors/rawSpeedVol-all.xml'
+columns = ['from', 'to', 'detector_id', 'direction', 'lane_id', 'speed', 'occupancy', 'volume', 'sd']
+def get_urls(url, start, end):
+    u = f'https://api.data.gov.hk/v1/historical-archive/list-file-versions?url={urllib.parse.quote_plus(url)}&start={start}&end={end}'
+    r = requests.get(u)
+    return [
+        f'https://api.data.gov.hk/v1/historical-archive/get-file?url={urllib.parse.quote_plus(url)}&time={t}'
+        for t in r.json()['timestamps']
+    ]
+
+
+def get_df(u):
+    r = requests.get(u)
+    soup = BeautifulSoup(r.text, features="xml")
+    date = soup.find('date').get_text()
+    d = pd.DataFrame(columns=columns)
+    for period in soup.find_all('period'):
+        for detector in period.find_all('detector'):
+            for lane in detector.find_all('lane'):
+                period_from = pd.to_datetime(f'{date} {period.find("period_from").get_text()}')
+                period_to = pd.to_datetime(f'{date} {period.find("period_to").get_text()}')
+                row = pd.DataFrame([[
+                    period_from,
+                    period_to,
+                    detector.find("detector_id").get_text(),
+                    detector.find("direction").get_text(),
+                    lane.find("lane_id").get_text(),
+                    int(lane.find('speed').get_text()),
+                    int(lane.find('occupancy').get_text()),
+                    int(lane.find('volume').get_text()),
+                    float(lane.find('s.d.').get_text())
+                ]], columns=columns)
+                d = pd.concat([d, row], ignore_index=True)
+    return d
+
+
+urls = get_urls(url, '20240122', '20240126')
+
+df = pd.DataFrame(columns=columns)
+
+with concurrent.futures.ProcessPoolExecutor(max_workers=8) as executor:
+    future_to_url = {executor.submit(get_df, u): u for u in urls}
+    for future in tqdm(concurrent.futures.as_completed(future_to_url), total=len(urls)):
+        url = future_to_url[future]
+        try:
+            r = future.result()
+        except Exception as exc:
+            print('%r generated an exception: %s' % (url, exc))
+            pass
+        else:
+            df = pd.concat([df, r], ignore_index=True)
+
+df.to_csv('lab4-20240122-20240126.csv', index=False)
+```
+
+After creating the file, please create a new Python script widget and copy the following code into the widget.
+
+```python
+from Orange.data import Table
+import subprocess
+
+subprocess.run(["python", "fetch_data.py"], check=True, text=True, shell=True)
+
+out_data = Table.from_file('lab4-20240122-20240126.csv')
+```
+
+During the execution of the code, please check out the CPU usage of your computer. You should see that 8 cores are fully utilized.
