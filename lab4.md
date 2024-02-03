@@ -304,7 +304,7 @@ for u in urls:
 out_data = Table.from_pandas_dfs(df[['speed', 'occupancy', 'volume', 'sd']],df[[]],df[['from', 'to', 'detector_id', 'direction', 'lane_id']])
 ```
 
-The above code would take a very long time to fetch the data, since it is a single-threaded program. We have also prepared a dataset for you. You can download the dataset from [here](https://gist.githubusercontent.com/hkbu-kennycheng/556e46dba59dccdc254b0ac0f24af6c3/raw/d73870173775e32c08ba8823c72d0dd3775eea51/lab4-20240122-20240126.csv).
+The above code would take a very long time to fetch the data, since it is a single-threaded program. We have also prepared a dataset for you. You can download the dataset from [here](https://gist.githubusercontent.com/hkbu-kennycheng/556e46dba59dccdc254b0ac0f24af6c3/raw/d73870173775e32c08ba8823c72d0dd3775eea51/lab4-20240122-20240126.csv) or [here](http://cs8230.comp.hkbu.edu.hk:8000/lab4-20240122-20240126.csv).
 
 ### Fetching data with multi-threaded program
 
