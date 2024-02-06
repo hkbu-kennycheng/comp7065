@@ -199,7 +199,198 @@ Technical indicators are widely used in stock price prediction. There are many t
 - Rolling Z Score indicator
 - Qstick indicator
 
+## Moving Average Convergence Divergence (MACD)
+
+MACD is a trend-following momentum indicator that shows the relationship between two moving averages of a security’s price. The MACD is calculated by subtracting the 26-period Exponential Moving Average (EMA) from the 12-period EMA. The result of that calculation is the MACD line. A nine-day EMA of the MACD called the "signal line," is then plotted on top of the MACD line, which can function as a trigger for buy and sell signals. Traders may buy the security when the MACD crosses above its signal line and sell - or short - the security when the MACD crosses below the signal line. Moving Average Convergence Divergence (MACD) indicators can be interpreted in several ways, but the more common methods are crossovers, divergences, and rapid rises/falls.
+
+## Bollinger Bands (BB)
+
+Bollinger Bands are a type of statistical chart characterizing the prices and volatility over time of a financial instrument or commodity, using a formulaic method propounded by John Bollinger in the 1980s. Financial traders employ these charts as a methodical tool to inform trading decisions, control automated trading systems, or as a component of technical analysis. Bollinger Bands display a graphical band (the envelope maximum and minimum of moving averages, similar to Keltner or Donchian channels) and volatility (expressed by the width of the envelope) in one two-dimensional chart.
+
+## Average Directional Index (ADX)
+
+The average directional index (ADX) is a technical analysis indicator used by some traders to determine the strength of a trend. The trend can be either up or down, and this is shown by two accompanying indicators, the Negative Directional Indicator (-DI) and the Positive Directional Indicator (+DI). The ADX is used to determine the potential of the market regarding its trend. It can also be used to determine when one should enter or exit a trade, based on whether the trend is rising or falling.
+
+## Average true range (ATR)
+
+The average true range (ATR) is a technical analysis indicator that measures market volatility by decomposing the entire range of an asset price for that period. Specifically, ATR is a measure of volatility introduced by market technician J. Welles Wilder Jr. in his book, "New Concepts in Technical Trading Systems." The true range indicator is taken as the greatest of the following: current high less the current low; the absolute value of the current high less the previous close; and the absolute value of the current low less the previous close. The average true range is then a moving average, generally using 14 days, of the true ranges.
+
+## T3 Moving Average (T3)
+
+The T3 Moving Average is considered superior to traditional MAs as it is smoother, more responsive and thus performs better in ranging market conditions as well. The T3 Moving Average is calculated like other MAs, however, the T3 MA also uses a smoothing factor based on the difference between the current price and the previous T3 value. The T3 Moving Average generally produces entry signals similar to other MAs however, due to its smoothing factor the T3 tends to produce more reliable signals during choppy, sideways trading periods.
+
+## Money Flow Index (MFI)
+
+The Money Flow Index (MFI) is a technical oscillator that uses price and volume for identifying overbought or oversold conditions in an asset. It can also be used to spot divergences which warn of a trend change in price. The oscillator moves between 0 and 100. It is considered overbought if it goes above 80 and oversold if it goes below 20. Divergences between price and MFI may also indicate a price reversal.
+
+## On-balance volume (OBV)
+
+On-balance volume (OBV) is a technical trading momentum indicator that uses volume flow to predict changes in stock price. Joseph Granville first developed the OBV metric in the 1960s. He believed that, when volume increases sharply without a significant change in the stock's price, the price will eventually jump upward, and vice versa. OBV is calculated by adding the total daily volume to a cumulative total when the price closes up, and subtracting the total daily volume when the price closes down.
+
+## LogReturn indicator
+
+LogReturn indicator is a technical indicator that measures the logarithmic return of a security. It is calculated by taking the natural logarithm of the current price divided by the previous price. The log return indicator is used to measure the performance of a security over a certain period of time. It is often used to compare the performance of different securities over the same period of time.
+
+## Rolling Z Score indicator
+
+Rolling Z Score indicator is a technical indicator that measures the rolling z score of a security. It is calculated by taking the z score of the current price divided by the previous price. The rolling z score indicator is used to measure the performance of a security over a certain period of time. It is often used to compare the performance of different securities over the same period of time.
+
 # Case Study: Microsoft (MSFT)
 
-In this lab, we will use Microsoft (MSFT) as an example to demonstrate how to use RNN to predict the stock price. We will use the historical stock price data from `2020-01-01` to `2020-12-31` to train the model. Then, we will use the model to predict the stock price from `2021-01-01` to `2021-01-31`. We will use the following technical indicators to predict the stock price:
+In this lab, we will use Microsoft (MSFT) as an example to demonstrate how to use RNN to predict the stock price. We will use the historical hourly stock price data from the last `730` days data, separated data from `2023-04-01` as the test data, and use the remaining data as the training data.
+
+## Fetch the historical stock price data
+
+First, we will fetch the historical stock price data from Yahoo Finance. You could use the following command to fetch the historical stock price data:
+
+```python
+import yfinance as yf
+days = 730
+hrsPerDay = 7
+
+msft = yf.Ticker('MSFT').history(interval='1h', period=f'{days}d')
+msft
+```
+
+## Visualize the stock price
+
+After fetching the stock price data, we could visualize the stock price data with [matplotlib](https://matplotlib.org/). You could use the following command to plot the historical Open and Close price of each day:
+
+```python
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10,6))
+plt.plot(msft.index, msft['Open'], label="Open") 
+plt.plot(msft.index, msft['Close'], label="Close") 
+plt.legend() 
+plt.show()
+```
+
+You may also plot them individually:
+
+```python
+plt.figure(figsize=(18,6))
+plt.plot(msft.index, msft['Open'], label="Open") 
+plt.legend() 
+plt.show()
+
+plt.figure(figsize=(18,6))
+plt.plot(msft.index, msft['Close'], label="Close") 
+plt.legend() 
+plt.show()
+```
+
+## Data cleaning and Feature engineering
+
+Let's take a look to the basic statistical information of the stock price data. You could use the following command to print the statistical information of the stock price data:
+
+```python
+msft.describe()
+```
+
+Since `Dividends` and `Stock Splits` are not carrying much information, we could drop them from the stock price data. You could use the following command to drop the `Dividends` and `Stock Splits` from the stock price data:
+
+```python
+msft.drop(columns=['Dividends', 'Stock Splits'], inplace=True)
+```
+
+As you may notice, the stock price data only contains the Open, High, Low, Close and Volume. There are too few features for the RNN model to predict the stock price. It's better to construct some technical indicators to help the RNN model to predict the stock price.
+
+To calculate the technical indicators, we will use the [`pandas_ta`](https://github.com/twopirllc/pandas-ta) package to construct the technical indicators. You could install the package with the following command:
+
+```jupyter
+!pip install pandas_ta
+```
+
+After you install the package, first import it as `ta` and then crreate and run our own Custom Strategy on the dataframe with `ta.Strategy`:
+
+```python
+import pandas as pd
+import pandas_ta as ta
+
+# Create and run our own Custom Strategy on the dataframe
+msft.ta.strategy(ta.Strategy(
+    name="My Custom Strategy",
+    ta=[
+        {"kind": "macd"}, # moving average convergence divergence
+        {"kind": "bbands"}, # bollinger bands
+        {"kind": "adx"}, # average directional index
+        {"kind": "atr"}, # average true range
+        {"kind": "t3"}, # t3 moving average
+        {"kind": "mfi"}, # money flow index
+        {"kind": "obv"}, # on-balance volume
+        {"kind": "log_return"}, # log return
+        {"kind": "zscore"}, # rolling z score
+        {"kind": "qstick", "length":7}, # qstick
+        {"kind": "short_run"} # short run
+    ]
+))
+
+pd.options.display.max_columns = msft.shape[1]
+msft.describe(include='all')
+```
+
+After the feature engineering, you could use the following command to see correlation between the features:
+
+```python
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+sns.heatmap(msft.corr(), cmap=plt.cm.Reds)
+plt.show()
+```
+
+## Data preprocessing
+
+Before we train the RNN model, we need to preprocess the data. There are several steps to preprocess the data:
+
+### Target variable
+Before we train the RNN model, we need to preprocess the data. We will use the MinMaxScaler to scale the data to the range of 0 to 1. We also construct the target variable by shifting the Close price by the number of hours per day. You could use the following command to preprocess the data:
+
+```python
+target_offset = -hrsPerDay
+msft['Target']=msft['Close'].shift(target_offset)
+msft = (msft - msft. min()) / (msft. max() - msft. min())
+```
+
+### Train and test split
+
+There are `730` days data in total. We could split 20 percent of the data as the test data and use the remaining data as the training data. You could use the following command to split the data:
+
+```python
+testDays = int(days*0.2*hrsPerDay)
+train_df = msft.iloc[:-testDays]
+test_df = msft.iloc[-testDays:]
+```
+
+### Build the Pytorch DataLoader
+
+After preprocessing the data, we could build the Pytorch DataLoader. You could use the following command to build the Pytorch DataLoader:
+
+```python
+import numpy as np
+import torch
+from torch.utils.data import Dataset, TensorDataset, DataLoader
+
+sequence_size = hrsPerDay * 5
+batch_size = 256
+features_size = len(train_df.drop(['Target'], axis=1).columns)
+
+class SequenceDataset(Dataset):
+
+    def __init__(self, df=pd.DataFrame(), label='', sequence_size=30):
+        self.df = df
+        self.label = label
+
+    def __len__(self):
+        return len(self.df) - sequence_size
+
+    def __getitem__(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        seq = Tensor(np.array(self.df.drop(self.label, axis=1).iloc[idx:idx+sequence_size, :], dtype=float))
+        label = Tensor(np.array(self.df[[self.label]].iloc[idx+sequence_size, :], dtype=float))
+
+        return (seq, label)
 
