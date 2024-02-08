@@ -244,12 +244,11 @@ In this lab, we will use Microsoft (MSFT) as an example to demonstrate how to us
 First, we will fetch the historical stock price data from Yahoo Finance. You could use the following command to fetch the historical stock price data:
 
 ```python
-import yfinance as yf
 days = 730
 hrsPerDay = 7
 
-msft = yf.Ticker('MSFT').history(interval='1h', period=f'{days}d')
-msft
+aapl = yf.Ticker('AAPL').history(interval='1h', period=f'{days}d')
+aapl
 ```
 
 ## Visualize the stock price
@@ -260,8 +259,8 @@ After fetching the stock price data, we could visualize the stock price data wit
 import matplotlib.pyplot as plt
 
 plt.figure(figsize=(10,6))
-plt.plot(msft.index, msft['Open'], label="Open") 
-plt.plot(msft.index, msft['Close'], label="Close") 
+plt.plot(aapl.index, aapl['Open'], label="Open") 
+plt.plot(aapl.index, aapl['Close'], label="Close") 
 plt.legend() 
 plt.show()
 ```
@@ -270,12 +269,12 @@ You may also plot them individually:
 
 ```python
 plt.figure(figsize=(18,6))
-plt.plot(msft.index, msft['Open'], label="Open") 
+plt.plot(aapl.index, aapl['Open'], label="Open") 
 plt.legend() 
 plt.show()
 
 plt.figure(figsize=(18,6))
-plt.plot(msft.index, msft['Close'], label="Close") 
+plt.plot(aapl.index, aapl['Close'], label="Close") 
 plt.legend() 
 plt.show()
 ```
@@ -285,13 +284,13 @@ plt.show()
 Let's take a look to the basic statistical information of the stock price data. You could use the following command to print the statistical information of the stock price data:
 
 ```python
-msft.describe()
+aapl.describe()
 ```
 
 Since `Dividends` and `Stock Splits` are not carrying much information, we could drop them from the stock price data. You could use the following command to drop the `Dividends` and `Stock Splits` from the stock price data:
 
 ```python
-msft.drop(columns=['Dividends', 'Stock Splits'], inplace=True)
+aapl.drop(columns=['Dividends', 'Stock Splits'], inplace=True)
 ```
 
 As you may notice, the stock price data only contains the Open, High, Low, Close and Volume. There are too few features for the RNN model to predict the stock price. It's better to construct some technical indicators to help the RNN model to predict the stock price.
@@ -309,7 +308,7 @@ import pandas as pd
 import pandas_ta as ta
 
 # Create and run our own Custom Strategy on the dataframe
-msft.ta.strategy(ta.Strategy(
+aapl.ta.strategy(ta.Strategy(
     name="My Custom Strategy",
     ta=[
         {"kind": "macd"}, # moving average convergence divergence
@@ -326,8 +325,8 @@ msft.ta.strategy(ta.Strategy(
     ]
 ))
 
-pd.options.display.max_columns = msft.shape[1]
-msft.describe(include='all')
+pd.options.display.max_columns = aapl.shape[1]
+aapl.describe(include='all')
 ```
 
 After the feature engineering, you could use the following command to see correlation between the features:
@@ -336,7 +335,7 @@ After the feature engineering, you could use the following command to see correl
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-sns.heatmap(msft.corr(), cmap=plt.cm.Reds)
+sns.heatmap(aapl.corr(), cmap=plt.cm.Reds)
 plt.show()
 ```
 
@@ -349,8 +348,9 @@ Before we train the RNN model, we need to preprocess the data. We will use the M
 
 ```python
 target_offset = -hrsPerDay
-msft['Target']=msft['Close'].shift(target_offset)
-msft = (msft - msft. min()) / (msft. max() - msft. min())
+aapl['Target'] = aapl['Close'].shift(target_offset)
+aapl = (aapl - aapl.min()) / (aapl.max() - aapl.min())
+aapl.dropna(inplace=True)
 ```
 
 ### Train and test split
@@ -359,8 +359,8 @@ There are `730` days data in total. We could split 20 percent of the data as the
 
 ```python
 testDays = int(days*0.2*hrsPerDay)
-train_df = msft.iloc[:-testDays]
-test_df = msft.iloc[-testDays:]
+train_df = aapl.iloc[:-testDays]
+test_df = aapl.iloc[-testDays:]
 ```
 
 ### Build the Pytorch DataLoader
@@ -370,7 +370,8 @@ After preprocessing the data, we could build the Pytorch DataLoader. You could u
 ```python
 import numpy as np
 import torch
-from torch.utils.data import Dataset, TensorDataset, DataLoader
+from torch import Tensor
+from torch.utils.data import Dataset, DataLoader, TensorDataset
 
 sequence_size = hrsPerDay * 5
 batch_size = 256
@@ -393,4 +394,117 @@ class SequenceDataset(Dataset):
         label = Tensor(np.array(self.df[[self.label]].iloc[idx+sequence_size, :], dtype=float))
 
         return (seq, label)
+
+train_loader = DataLoader(SequenceDataset(train_df, label='Target', sequence_size=sequence_size), batch_size=batch_size, shuffle=True)
+test_loader = DataLoader(SequenceDataset(test_df, label='Target', sequence_size=sequence_size), batch_size=batch_size, shuffle=False)
+```
+
+## Build the RNN model
+
+After preprocessing the data, we could build the RNN model. The model architecture is very simple. It contains two GRU layers and two fully connected layers. Here is an overview of the model architecture:
+
+```mermaid
+graph LR
+    A[Input] --> B[GRU]
+    B --> C[GRU]
+    C --> D[Linear]
+    D --> E[Linear]
+```
+
+You could use the following command to build the model:
+
+
+```python
+import torch.nn as nn
+
+hiddenSize = 256
+
+class extract_tensor(nn.Module):
+    def forward(self,x):
+        # Output shape (batch, features, hidden)
+        tensor, _ = x
+        # Reshape shape (batch, hidden)
+        return tensor[:, -1, :]
+
+model = nn.Sequential(
+    nn.GRU(features_size, hiddenSize, num_layers=2, batch_first=True, dropout=0.1),
+    nn.Sequential(
+      extract_tensor(),
+      nn.Linear(hiddenSize, int(hiddenSize/2)),
+      nn.Linear(int(hiddenSize/2), 1),
+    )
+)
+```
+
+## Define the loss function and optimizer
+
+After building the model, we need to define the loss function and optimizer. You could use the following command to define the loss function and optimizer:
+
+```python
+from torch import optim
+
+loss_function = nn.MSELoss()
+optimizer = optim.Adam(model.parameters(), lr=1e-3)
+```
+
+## Train the model
+
+After defining the loss function and optimizer, we could train the model. You could use the following command to train the model:
+
+```python
+%%time
+
+from tqdm import tqdm
+import torch
+
+NUM_EPOCHS = 300
+
+model.train() # put model in training mode
+
+for epoch in range(NUM_EPOCHS):
+  
+  loop = tqdm(train_loader, position=0, leave=True)
+  
+  running_loss = 0.0
+  
+  for (batch, labels) in loop:
+
+    optimizer.zero_grad()
+    model.to('cuda')
+    output = model.forward(batch.to('cuda'))
+
+    var = torch.ones(output.shape).to('cuda')
+    loss = loss_function(output.to('cuda'), labels.to('cuda'))
+    loss.to('cuda')
+    loss.backward()
+
+    optimizer.step()
+
+    running_loss += loss.item()
+    loop.set_postfix(epoch=epoch, loss=running_loss)
+```
+
+## Visualize the result
+
+After training the model, we could visualize the result. You could use the following command to visualize the result
+
+```python
+import matplotlib.pyplot as plt 
+
+correct = 0
+loop = tqdm(test_loader, position=0, leave=True)
+
+out = torch.Tensor()
+
+for (batch, labels) in loop:
+    output = model.forward(batch.to('cuda'))
+#     print(labels, output)
+    plt.plot(range(0, len(output.cpu().detach())), labels.cpu().detach(), label="Target")
+    plt.plot(range(0, len(output.cpu().detach())), output.cpu().detach(), label="Output")
+    plt.legend()
+    plt.show()
+```
+
+
+# Case Study: Microsoft (MSFT)
 
