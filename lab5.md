@@ -373,7 +373,7 @@ import torch
 from torch import Tensor
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 
-sequence_size = hrsPerDay
+sequence_size = hrsPerDay * 5 # 5 days
 batch_size = 256
 features_size = len(train_df.drop(['Target'], axis=1).columns)
 
@@ -477,7 +477,7 @@ for epoch in range(NUM_EPOCHS):
     model.to(dev)
     output = model.forward(batch.to(dev))
 
-    loss = loss_function(output.to(dev), labels.to(dev), torch.ones(output.shape).to(dev))
+    loss = loss_function(output.to(dev), labels.to(dev))
     loss.to(dev)
     loss.backward()
 
@@ -496,8 +496,7 @@ import matplotlib.pyplot as plt
 
 correct = 0
 loop = tqdm(test_loader, position=0, leave=True)
-
-out = torch.Tensor()
+model.eval()
 
 for (batch, labels) in loop:
     output = model.forward(batch.to(dev))
@@ -750,6 +749,20 @@ for (batch, labels) in loop:
     plt.legend()
     plt.show()
 ```
+
+### Discussion: Result after epoch 1000
+
+Let's take a look at the result after epoch 1000.
+
+![](lab5/result1.png)
+
+![](lab5/result2.png)
+
+![](lab5/result3.png)
+
+![](lab5/result4.png)
+
+What do you think about the result? Do you think the model is able to predict the stock closing price change percentage accurately?
 
 # Exploratory Exercise: Nvidia (NVDA)
 
