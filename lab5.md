@@ -258,7 +258,7 @@ After fetching the stock price data, we could visualize the stock price data wit
 ```python
 import matplotlib.pyplot as plt
 
-plt.figure(figsize=(10,6))
+plt.figure(figsize=(18,6))
 plt.plot(aapl.index, aapl['Open'], label="Open") 
 plt.plot(aapl.index, aapl['Close'], label="Close") 
 plt.legend() 
@@ -373,7 +373,7 @@ import torch
 from torch import Tensor
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 
-sequence_size = hrsPerDay * 5
+sequence_size = hrsPerDay
 batch_size = 256
 features_size = len(train_df.drop(['Target'], axis=1).columns)
 
@@ -382,16 +382,17 @@ class SequenceDataset(Dataset):
     def __init__(self, df=pd.DataFrame(), label='', sequence_size=30):
         self.df = df
         self.label = label
+        self.sequence_size = sequence_size
 
     def __len__(self):
-        return len(self.df) - sequence_size
+        return len(self.df) - self.sequence_size
 
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        seq = Tensor(np.array(self.df.drop(self.label, axis=1).iloc[idx:idx+sequence_size, :], dtype=float))
-        label = Tensor(np.array(self.df[[self.label]].iloc[idx+sequence_size, :], dtype=float))
+        seq = Tensor(np.array(self.df.drop(self.label, axis=1).iloc[idx:idx+self.sequence_size, :], dtype=float))
+        label = Tensor(np.array(self.df[[self.label]].iloc[idx+self.sequence_size, :], dtype=float))
 
         return (seq, label)
 
@@ -438,7 +439,7 @@ model = nn.Sequential(
 
 ## Define the loss function and optimizer
 
-After building the model, we need to define the loss function and optimizer. You could use the following command to define the loss function and optimizer:
+After building the model, we need to define the loss function and optimizer.You could use the following command to define the loss function and optimizer:
 
 ```python
 from torch import optim
@@ -457,7 +458,10 @@ After defining the loss function and optimizer, we could train the model. You co
 from tqdm import tqdm
 import torch
 
-NUM_EPOCHS = 300
+NUM_EPOCHS = 100
+dev = 'cuda'
+# comment previous line and uncomment following line if you don't have a GPU
+# dev = 'cpu'
 
 model.train() # put model in training mode
 
@@ -470,12 +474,11 @@ for epoch in range(NUM_EPOCHS):
   for (batch, labels) in loop:
 
     optimizer.zero_grad()
-    model.to('cuda')
-    output = model.forward(batch.to('cuda'))
+    model.to(dev)
+    output = model.forward(batch.to(dev))
 
-    var = torch.ones(output.shape).to('cuda')
-    loss = loss_function(output.to('cuda'), labels.to('cuda'))
-    loss.to('cuda')
+    loss = loss_function(output.to(dev), labels.to(dev), torch.ones(output.shape).to(dev))
+    loss.to(dev)
     loss.backward()
 
     optimizer.step()
@@ -497,7 +500,7 @@ loop = tqdm(test_loader, position=0, leave=True)
 out = torch.Tensor()
 
 for (batch, labels) in loop:
-    output = model.forward(batch.to('cuda'))
+    output = model.forward(batch.to(dev))
 #     print(labels, output)
     plt.plot(range(0, len(output.cpu().detach())), labels.cpu().detach(), label="Target")
     plt.plot(range(0, len(output.cpu().detach())), output.cpu().detach(), label="Output")
@@ -505,6 +508,249 @@ for (batch, labels) in loop:
     plt.show()
 ```
 
+## Discussion
+
+You may notice that the prediction line follows the target line closely with an offset. It seems that the RNN model is able to predict the stock price accurately. However, it's not always the case. The stock price is very volatile. It's very difficult to predict the stock price accurately.
+
+In conclusion, even the model could predict the stock price closely, we could only take the result as a reference. It's not practical to apply this kind of model for algo trading.
+
 
 # Case Study: Microsoft (MSFT)
 
+Let's take a look at the stock price of Microsoft (MSFT). To make the model more practical, we could take another approach to make the model. We could predict the stock closing price change percentage instead of the stock price. So that it would be more practical to apply the model for algo trading.
+
+## Fetch the historical stock price data
+
+First, we will fetch the historical stock price data from Yahoo Finance. You could use the following command to fetch the historical stock price data:
+
+```python
+days = 730
+hrsPerDay = 7
+
+msft = yf.Ticker('MSFT').history(interval='1h', period=f'{days}d')
+msft.drop(columns=['Dividends', 'Stock Splits'], inplace=True)
+msft
+```
+
+## Visualize the stock price
+
+After fetching the stock price data, we could visualize the stock price data with [matplotlib](https://matplotlib.org/). You could use the following command to plot the historical Open and Close price of each day:
+
+```python
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(18,6))
+plt.plot(msft.index, msft['Close'], label="Close") 
+plt.legend() 
+plt.show()
+```
+
+## Construct the technical indicator features
+
+After fetching the stock price data, we could construct the technical indicator features. You could use the following command to construct the technical indicator features:
+
+```python
+import pandas as pd
+import pandas_ta as ta
+
+# Create and run our own Custom Strategy on the dataframe
+msft.ta.strategy(ta.Strategy(
+    name="My Custom Strategy",
+    ta=[
+        {"kind": "macd"}, # moving average convergence divergence
+        {"kind": "bbands"}, # bollinger bands
+        {"kind": "adx"}, # average directional index
+        {"kind": "atr"}, # average true range
+        {"kind": "t3"}, # t3 moving average
+        {"kind": "mfi"}, # money flow index
+        {"kind": "obv"}, # on-balance volume
+        {"kind": "log_return"}, # log return
+        {"kind": "zscore"}, # rolling z score
+        {"kind": "qstick", "length":7}, # qstick
+        {"kind": "short_run"} # short run
+    ]
+))
+
+pd.options.display.max_columns = msft.shape[1]
+msft.describe(include='all')
+```
+
+## Construct the target variable and apply Z-score normalization
+
+Before we train the RNN model, we need to construct the target variable. We caculate the stock closing price change percentage by shifting the Close price by the number of hours per day, subtracting the Close price and then dividing by the Close price.
+
+### Standard score (Z-score) normalization
+
+Standard score (Z-score) normalization is the process of standardizing the features of a dataset. It is a common technique used in machine learning to transform features to have a mean of 0 and a standard deviation of 1. It is useful when the features of a dataset have different units of measurement.
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/The_Normal_Distribution.svg/1280px-The_Normal_Distribution.svg.png)
+
+We then apply Z-score normalization to the stock price data. You could use the following command to construct the target variable and apply Z-score normalization:
+
+```python
+target_offset = -hrsPerDay
+target = ((msft['Close'].shift(target_offset) - msft['Close']) / msft['Close'] * 100)
+msft = (msft - msft.mean())/msft.std(ddof=0) # Z-score calculation
+msft['Target'] = target
+msft.dropna(inplace=True)
+```
+
+## Train and test split
+
+There are `730` days data in total. We could split 20 percent of the data as the test data and use the remaining data as the training data. You could use the following command to split the data:
+
+```python
+testDays = int(days*0.2*hrsPerDay)
+train_df = msft.iloc[:-testDays]
+test_df = msft.iloc[-testDays:]
+```
+
+Let's take a look at the `Target` of training data:
+
+```python
+plt.figure(figsize=(18,6))
+train_df['Target'].plot()
+```
+
+## Build the Pytorch DataLoader
+
+After preprocessing the data, we could build the Pytorch DataLoader. We will use the previous declared `SequenceDataset` class to build the Pytorch DataLoader. You could use the following command to build the Pytorch DataLoader:
+
+```python
+import numpy as np
+import torch
+from torch import nn, Tensor
+from torch.utils.data import Dataset, TensorDataset, DataLoader
+
+sequence_size = hrsPerDay * 5 # 5 days
+batch_size = 256
+features_size = len(train_df.drop(['Target'], axis=1).columns)
+
+class SequenceDataset(Dataset):
+
+    def __init__(self, df=pd.DataFrame(), label='', sequence_size=30):
+        self.df = df
+        self.label = label
+        self.sequence_size = sequence_size
+
+    def __len__(self):
+        return len(self.df) - self.sequence_size
+
+    def __getitem__(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        seq = Tensor(np.array(self.df.drop(self.label, axis=1).iloc[idx:idx+self.sequence_size, :], dtype=float))
+        label = Tensor(np.array(self.df[[self.label]].iloc[idx+self.sequence_size, :], dtype=float))
+
+        return (seq, label)
+
+train_loader = DataLoader(SequenceDataset(train_df, label='Target', sequence_size=sequence_size), batch_size=batch_size, shuffle=True)
+test_loader = DataLoader(SequenceDataset(test_df, label='Target', sequence_size=sequence_size), batch_size=batch_size, shuffle=False)
+```
+
+## Build the RNN model
+
+After preprocessing the data, we could build the RNN model. We also re-use previous model architecture. You could use the following command to build the model:
+
+```python
+hiddenSize = 256
+
+model = nn.Sequential(
+    nn.GRU(features_size, hiddenSize, num_layers=2, batch_first=True, dropout=0.1),
+    nn.Sequential(
+      extract_tensor(),
+      nn.Linear(hiddenSize, int(hiddenSize/2)),
+      nn.Linear(int(hiddenSize/2), 1),
+    )
+)
+```
+
+## Define the loss function and optimizer
+
+After building the model, we need to define the loss function and optimizer.
+
+### GaussianNLLLoss
+
+In this model, we will use the [GaussianNLLLoss](https://pytorch.org/docs/stable/generated/torch.nn.GaussianNLLLoss.html) as the loss function.
+The GaussianNLLLoss is a loss function that measures the negative log likelihood of the Gaussian distribution.
+
+![](https://url2png.hkbu.app/pytorch.org/docs/stable/generated/torch.nn.GaussianNLLLoss.html)
+
+### RMSprop optimizer
+
+[RMSprop](https://pytorch.org/docs/stable/generated/torch.optim.RMSprop.html) is an optimizer that uses the magnitude of recent gradients to normalize the gradients. It is a popular optimizer for training RNN models.
+
+![](https://url2png.hkbu.app/pytorch.org/docs/stable/generated/torch.optim.RMSprop.html)
+
+You could use the following command to define the loss function and optimizer:
+
+```python
+from torch import optim
+
+loss_function = nn.GaussianNLLLoss()
+optimizer = optim.RMSprop(model.parameters(), lr=1e-3)
+```
+
+## Train the model
+
+After defining the loss function and optimizer, we could train the model. You could use the following command to train the model:
+
+```python
+%%time
+
+from tqdm import tqdm
+import torch
+
+NUM_EPOCHS = 500
+dev = 'cuda'
+# comment previous line and uncomment following line if you don't have a GPU
+# dev = 'cpu'
+
+model.train() # put model in training mode
+
+for epoch in range(NUM_EPOCHS):
+  
+  loop = tqdm(train_loader, position=0, leave=True)
+  
+  running_loss = 0.0
+  
+  for (batch, labels) in loop:
+
+    optimizer.zero_grad()
+    model.to(dev)
+    output = model.forward(batch.to(dev))
+
+    loss = loss_function(output.to(dev), labels.to(dev), torch.ones(output.shape).to(dev))
+    loss.to(dev)
+    loss.backward()
+
+    optimizer.step()
+
+    running_loss += loss.item()
+    loop.set_postfix(epoch=epoch, loss=running_loss)
+```
+
+## Visualize the result
+
+After training the model, we could visualize the result. You could use the following command to visualize the result
+
+```python
+import matplotlib.pyplot as plt 
+
+correct = 0
+loop = tqdm(test_loader, position=0, leave=True)
+model.eval()
+
+for (batch, labels) in loop:
+    output = model.forward(batch.to(dev))
+    #print(labels, output)
+    plt.plot(range(0, len(output.cpu().detach())), labels.cpu().detach(), label="Target")
+    plt.plot(range(0, len(output.cpu().detach())), output.cpu().detach(), label="Output")
+    plt.legend()
+    plt.show()
+```
+
+# Exploratory Exercise: Nvidia (NVDA)
+
+Please apply what you have learn from the lab to predict the stock price of Nvidia (NVDA) and show me your result. You may also try to use different technical indicators and increase the number of epochs to see if it could improve the model performance.
