@@ -85,7 +85,7 @@ print(finnhub_client.symbol_lookup('apple'))
 Previously, we have learned how to fetch the market news. Now, let's take a look at how to fetch the news of a specific company. You could use the following command to fetch the company
 
 ```python
-print(finnhub_client.company_news('AAPL', _from="2023-12-01", to="2020-01-27"))
+print(finnhub_client.company_news('AAPL', _from="2023-12-01", to="2024-01-27"))
 ```
 
 ### Real-time stock price
@@ -199,47 +199,59 @@ Technical indicators are widely used in stock price prediction. There are many t
 - Rolling Z Score indicator
 - Qstick indicator
 
-## Moving Average Convergence Divergence (MACD)
+### Moving Average Convergence Divergence (MACD)
+
+![](https://upload.wikimedia.org/wikipedia/commons/f/f9/MACDpicwiki.gif)
 
 MACD is a trend-following momentum indicator that shows the relationship between two moving averages of a security’s price. The MACD is calculated by subtracting the 26-period Exponential Moving Average (EMA) from the 12-period EMA. The result of that calculation is the MACD line. A nine-day EMA of the MACD called the "signal line," is then plotted on top of the MACD line, which can function as a trigger for buy and sell signals. Traders may buy the security when the MACD crosses above its signal line and sell - or short - the security when the MACD crosses below the signal line. Moving Average Convergence Divergence (MACD) indicators can be interpreted in several ways, but the more common methods are crossovers, divergences, and rapid rises/falls.
 
-## Bollinger Bands (BB)
+### Bollinger Bands (BB)
+
+![](https://upload.wikimedia.org/wikipedia/commons/3/35/Bollinger_Bands.png)
 
 Bollinger Bands are a type of statistical chart characterizing the prices and volatility over time of a financial instrument or commodity, using a formulaic method propounded by John Bollinger in the 1980s. Financial traders employ these charts as a methodical tool to inform trading decisions, control automated trading systems, or as a component of technical analysis. Bollinger Bands display a graphical band (the envelope maximum and minimum of moving averages, similar to Keltner or Donchian channels) and volatility (expressed by the width of the envelope) in one two-dimensional chart.
 
-## Average Directional Index (ADX)
+### Average Directional Index (ADX)
+
+![](https://www.investopedia.com/thmb/oM5y6hPXWlQkLjDKzRODItib_Ak=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/dotdash_INV-final-Average-Directional-Index-ADX-May-2021-01-a4b90b10676a437287683e38e0d2c7bd.jpg)
 
 The average directional index (ADX) is a technical analysis indicator used by some traders to determine the strength of a trend. The trend can be either up or down, and this is shown by two accompanying indicators, the Negative Directional Indicator (-DI) and the Positive Directional Indicator (+DI). The ADX is used to determine the potential of the market regarding its trend. It can also be used to determine when one should enter or exit a trade, based on whether the trend is rising or falling.
 
-## Average true range (ATR)
+### Average true range (ATR)
+
+![](https://upload.wikimedia.org/wikipedia/commons/c/ce/ATR_Indicator_Chart.png)
 
 The average true range (ATR) is a technical analysis indicator that measures market volatility by decomposing the entire range of an asset price for that period. Specifically, ATR is a measure of volatility introduced by market technician J. Welles Wilder Jr. in his book, "New Concepts in Technical Trading Systems." The true range indicator is taken as the greatest of the following: current high less the current low; the absolute value of the current high less the previous close; and the absolute value of the current low less the previous close. The average true range is then a moving average, generally using 14 days, of the true ranges.
 
-## T3 Moving Average (T3)
+### T3 Moving Average (T3)
+
+![](https://www.tradingpedia.com/wp-content/uploads/2014/07/T3-MA.png)
 
 The T3 Moving Average is considered superior to traditional MAs as it is smoother, more responsive and thus performs better in ranging market conditions as well. The T3 Moving Average is calculated like other MAs, however, the T3 MA also uses a smoothing factor based on the difference between the current price and the previous T3 value. The T3 Moving Average generally produces entry signals similar to other MAs however, due to its smoothing factor the T3 tends to produce more reliable signals during choppy, sideways trading periods.
 
-## Money Flow Index (MFI)
+### Money Flow Index (MFI)
+
+![](https://upload.wikimedia.org/wikipedia/commons/f/f1/Money_Flow_Index.png)
 
 The Money Flow Index (MFI) is a technical oscillator that uses price and volume for identifying overbought or oversold conditions in an asset. It can also be used to spot divergences which warn of a trend change in price. The oscillator moves between 0 and 100. It is considered overbought if it goes above 80 and oversold if it goes below 20. Divergences between price and MFI may also indicate a price reversal.
 
-## On-balance volume (OBV)
+### On-balance volume (OBV)
+
+![](https://upload.wikimedia.org/wikipedia/commons/4/40/Obvdaily.png)
 
 On-balance volume (OBV) is a technical trading momentum indicator that uses volume flow to predict changes in stock price. Joseph Granville first developed the OBV metric in the 1960s. He believed that, when volume increases sharply without a significant change in the stock's price, the price will eventually jump upward, and vice versa. OBV is calculated by adding the total daily volume to a cumulative total when the price closes up, and subtracting the total daily volume when the price closes down.
 
-## LogReturn indicator
+### LogReturn indicator
 
 LogReturn indicator is a technical indicator that measures the logarithmic return of a security. It is calculated by taking the natural logarithm of the current price divided by the previous price. The log return indicator is used to measure the performance of a security over a certain period of time. It is often used to compare the performance of different securities over the same period of time.
 
-## Rolling Z Score indicator
+### Rolling Z Score indicator
+
+![](https://miro.medium.com/v2/resize:fit:4800/format:webp/1*9zOuqcSVP-WtnsO8FqfGAg.png)
 
 Rolling Z Score indicator is a technical indicator that measures the rolling z score of a security. It is calculated by taking the z score of the current price divided by the previous price. The rolling z score indicator is used to measure the performance of a security over a certain period of time. It is often used to compare the performance of different securities over the same period of time.
 
-# Case Study: Microsoft (MSFT)
-
-In this lab, we will use Microsoft (MSFT) as an example to demonstrate how to use RNN to predict the stock price. We will use the historical hourly stock price data from the last `730` days data, separated data from `2023-04-01` as the test data, and use the remaining data as the training data.
-
-## Fetch the historical stock price data
+## Fetch the historical hourly stock price data
 
 First, we will fetch the historical stock price data from Yahoo Finance. You could use the following command to fetch the historical stock price data:
 
