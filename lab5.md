@@ -762,7 +762,7 @@ for (batch, labels) in loop:
     plt.show()
 ```
 
-### Discussion: Result after epoch 1000
+### Discussion: Result after epoch 1000 and 2000
 
 Let's take a look at the result after epoch 1000.
 
@@ -774,7 +774,18 @@ Let's take a look at the result after epoch 1000.
 
 ![](lab5/result4.png)
 
-What do you think about the result? Do you think the model is able to predict the stock closing price change percentage accurately?
+Here are result after epoch 2000.
+
+![](lab5/result5.png)
+
+![](lab5/result6.png)
+
+![](lab5/result7.png)
+
+![](lab5/result8.png)
+
+
+What do you think about the result? Do you think the model is able to predict the stock closing price change percentage accurately? What's the reason behind it?
 
 # Exploratory Exercise: Nvidia (NVDA)
 
