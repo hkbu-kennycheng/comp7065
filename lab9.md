@@ -766,23 +766,23 @@ for (batch, labels) in loop:
 
 Let's take a look at the result after epoch 1000.
 
-![](lab5/result1.png)
+![](lab9/result1.png)
 
-![](lab5/result2.png)
+![](lab9/result2.png)
 
-![](lab5/result3.png)
+![](lab9/result3.png)
 
-![](lab5/result4.png)
+![](lab9/result4.png)
 
 Here are result after epoch 2000.
 
-![](lab5/result5.png)
+![](lab9/result5.png)
 
-![](lab5/result6.png)
+![](lab9/result6.png)
 
-![](lab5/result7.png)
+![](lab9/result7.png)
 
-![](lab5/result8.png)
+![](lab9/result8.png)
 
 
 What do you think about the result? Do you think the model is able to predict the stock closing price change percentage accurately? What's the reason behind it?
