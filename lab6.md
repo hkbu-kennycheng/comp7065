@@ -367,14 +367,13 @@ model.eval()
 running_loss = 0.0
 
 with torch.no_grad():
-    for i, data in enumerate(test_dataloader):
+    bar = tqdm(enumerate(test_dataloader))
+    for i, data in bar:
         inputs, labels = data['image'], data['landmarks']
         outputs = model(inputs)
         loss = criterion(outputs.reshape(batch_size, 5, 2), labels)
-        loss.to(device)
         running_loss += loss.item()
-
-print(f'Loss: {running_loss / len(test_dataloader)}')
+        bar.set_postfix(batch=i, loss=running_loss / len(test_dataloader), running_loss=running_loss)
 ```
 
 In the above code, we put the model in evaluation mode using `model.eval()` and iterate over the test dataset to compute the loss. We can also visualize the results by plotting the images and predicted facial landmarks.
