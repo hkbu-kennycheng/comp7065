@@ -284,7 +284,9 @@ Next, we need to define the pre-trained model and fine-tune it to detect facial 
 
 MobileNetV2 is a lightweight deep learning model that is designed for mobile and embedded vision applications. It is based on the MobileNetV1 architecture and uses inverted residual blocks with linear bottlenecks. It has a small memory footprint and low computational cost, making it suitable for real-time applications on mobile and embedded devices. The model is pre-trained on the ImageNet dataset and has been widely used for various computer vision tasks. Here is the architecture of MobileNetV2:
 
-![](https://www.researchgate.net/publication/350152088/figure/fig1/AS:1002717703045121@1616077938892/The-proposed-MobileNetV2-network-architecture.png)
+![](https://pytorch.org/assets/images/mobilenet_v2_1.png)
+
+![](https://pytorch.org/assets/images/mobilenet_v2_2.png)
 
 Here is the code to define the pre-trained MobileNetV2 model and print the model architecture:
 
@@ -376,6 +378,16 @@ print(f'Loss: {running_loss / len(test_dataloader)}')
 
 In the above code, we put the model in evaluation mode using `model.eval()` and iterate over the test dataset to compute the loss. We can also visualize the results by plotting the images and predicted facial landmarks.
 
+## Evaluate the model
+
+We can evaluate the model prediction with the ground truth facial landmarks. We can define a function to compute the Euclidean distance between the predicted and ground truth facial landmarks.
+
+```python
+def euclidean_dist(vector_x, vector_y):
+    vector_x, vector_y = np.array(vector_x), np.array(vector_y)
+    return np.sqrt(np.sum((vector_x - vector_y)**2, axis=-1))
+```
+
 ## Visualize the results
 
 Finally, we can visualize the results by plotting the images and predicted facial landmarks. We can define a function to plot the images and predicted facial landmarks.
@@ -394,7 +406,7 @@ for i, sample in enumerate(test_dataset):
 
     ax = plt.subplot(1, 4, i + 1)
     plt.tight_layout()
-    ax.set_title('Sample #{}'.format(i))
+    ax.set_title('Sample #{} distance {}'.format(i, np.sum(euclidean_dist(outputs, landmarks))))
     ax.axis('off')
 
     plt.imshow(image) # rearrange color channel from BGR to RGB
