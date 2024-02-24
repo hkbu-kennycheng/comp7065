@@ -69,7 +69,7 @@ First, we need to download the dataset and extract it to the current directory. 
 ```python
 import urllib.request
 import zipfile
-
+import os
 
 def download_and_extract_zip(url):
     # Extract the filename from the URL
@@ -162,8 +162,8 @@ for i, sample in enumerate(face_dataset):
     ax.axis('off')
 
     plt.imshow(sample['image'].permute(1, 2, 0)) # rearrange color channel from BGR to RGB
-    plt.scatter(sample['landmarks'][:, 0], sample['landmarks'][:, 1], s=10, marker='.', c='r')
-    plt.scatter(sample['bbox'][:, 0], sample['bbox'][:, 1], s=10, marker='.', c='g')
+    plt.scatter(sample['landmarks'][:, 0], sample['landmarks'][:, 1], s=50, marker='.', c='r')
+    plt.scatter(sample['bbox'][:, 0], sample['bbox'][:, 1], s=50, marker='.', c='g')
 
     if i == 3:
         plt.show()
@@ -339,7 +339,7 @@ from tqdm import tqdm
 model.to(device)
 model.train()
 
-for epoch in range(5):
+for epoch in range(3):
     running_loss = 0.0
     bar = tqdm(enumerate(train_dataloader))
     for i, data in bar:
@@ -371,6 +371,7 @@ with torch.no_grad():
         inputs, labels = data['image'], data['landmarks']
         outputs = model(inputs)
         loss = criterion(outputs.reshape(batch_size, 5, 2), labels)
+        loss.to(device)
         running_loss += loss.item()
 
 print(f'Loss: {running_loss / len(test_dataloader)}')
