@@ -88,29 +88,30 @@ results.show()
 
 ## Detect Objects in Videos
 
-Next, we will detect objects in the videos using the pre-trained YOLO model. We will use the `detect` method of the pre-trained YOLO model to detect objects in the videos. The `detect` method takes the input videos as an argument and returns the detected objects in the videos. We will use the `detect` method to detect objects in a few videos and visualize the results.
+Next, we will detect objects in the videos using the pre-trained YOLO model. We will make use of `supervision` package to process the video and detect objects in the video. The `supervision` package provides a convenient way to process the video and detect objects in the video. We will use the `supervision` package to process the video and detect objects in the video.
 
 ```python
-import cv2
+import supervision as sv
+import numpy as np
 
-# download video file with torch.hub
 video_path = 'car_chase_01.mp4'
-torch.hub.download_url_to_file('https://github.com/dannylee1020/object-detection-video/raw/master/videos/car_chase_01.mp4', video_path)
-cap = cv2.VideoCapture(video_path)
+torch.hub.download_url_to_file('https://github.com/dannylee1020/object-detection-video/raw/master/videos/car_chase_01.mp4', video_path, progress=False)
 
-while(cap.isOpened()):
-    ret, frame = cap.read()
-    if ret:
-        results = model(ret)
-        results.print()
-        cv2.imshow("frame", results.xyxy[0])
-        cv2.waitKey(1)
-    else:
-        break
-
-cap.release()
-cv2.destroyAllWindows()
+video_info = sv.VideoInfo.from_video_path(video_path)
 ```
+
+After that,
+
+```python
+def process_frame(frame: np.ndarray, _) -> np.ndarray:
+    results = model(frame)
+    results.save()
+    results.show()
+    return frame
+
+sv.process_video(source_path=video_path, target_path=f"result.mp4", callback=process_frame)
+```
+
 
 
 # Case Study: Training the YOLO Model from Scratch with VOC Dataset
