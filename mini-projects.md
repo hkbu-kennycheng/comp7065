@@ -31,6 +31,12 @@ Each student requires to submit an individual report of their work in the projec
 5. **References**: A list of references you used in your work.
 6. **Appendix**: Any additional information you want to include in your report.
 
+## Project submission
+
+The project should be submitted as a zip file consists of Jupyter Notebook and python file. The project should be submitted to the Moodle submission box by 23:59 of 19 April 2024. If there are not enough spaces in the submission box, please provide us a public link to your project files in the submission box.
+
+The individual report should be submitted in a separated submission box.
+
 # Project Topics
 
 There are three suggested topics for the mini-project, and each group can choose one of the topics. Project topics are closely related to the course material, and they are designed to test the student's understanding of the course material and the ability to apply the knowledge to solve real-world problems. You are welcome to propose your own topics, but they must be approved by the instructor.
