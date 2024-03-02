@@ -258,6 +258,12 @@ Finally, we will save the trained model to a file. We will use the `torch.save` 
 torch.save(model.state_dict(), 'yolov5n_voc.pth')
 ```
 
+## Train with CLI
+
+Each YOLOv5 model comes with a command-line interface (CLI) that allows you to train, test, and run the model. The YOLOv5 CLI is a convenient way to interact with the YOLOv5 model and perform various tasks. You can use the YOLOv5 CLI to train the model on a dataset, test the model on a dataset, and run the model on images and videos. The YOLOv5 CLI provides a simple and intuitive way to interact with the YOLOv5 model. Here is the official [documentation](https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data) for training custom data.
+
+But the drawback is that ome of the services involved in the YOLOv5 CLI are commerial, so you may need to pay for them.
+
 # Exploretory Exercise: Detect Objects in Images Captured from the Car's Camera
 
 In this exercise, please use the [Udacity Self Driving Car Dataset](https://public.roboflow.com/object-detection/self-driving-car) to train the YOLO model and detect objects in the images captured from the car's camera. You will need to train from scratch and visualize the results.
