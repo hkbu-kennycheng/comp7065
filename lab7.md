@@ -300,6 +300,20 @@ labels = np.concatenate(dataset.labels, 0)
 mlc = int(labels[:, 0].max())  # max label class
 ```
 
+## Define the optimizer and loss function
+
+YOLO use the `smart_optimizer` and `ComputeLoss` to define the optimizer and loss function. The `smart_optimizer` function is used to define the optimizer for the YOLO model. The `ComputeLoss` function is used to define the loss function for the YOLO model.
+
+```python
+# Define the optimizer and loss function
+
+from yolov5.utils.torch_utils import smart_optimizer
+from yolov5.utils.loss import ComputeLoss
+
+optimizer = smart_optimizer(model)
+compute_loss = ComputeLoss(model)  # Define loss function
+```
+
 ## Train the YOLO Model
 
 Finally, we will train the YOLO model on the VOC dataset. We will use the `train` method of the YOLO model to train the model on the VOC dataset. The `train` method takes the DataLoader and the training settings as arguments and trains the model on the dataset. We will use the `train` method to train the YOLO model on the VOC dataset.
