@@ -290,14 +290,13 @@ from yolov5.utils.dataloaders import create_dataloader
 train_loader, dataset = create_dataloader(
     train_path,
     img_size,
-    1,
+    batch_size,
     max(int(model.stride.max()), 32),
     hyp=hyp,
     augment=True,
     shuffle=True,
 )
 labels = np.concatenate(dataset.labels, 0)
-mlc = int(labels[:, 0].max())  # max label class
 ```
 
 ## Define the optimizer and loss function
