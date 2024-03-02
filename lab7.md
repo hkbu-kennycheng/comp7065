@@ -129,23 +129,92 @@ First, we will install the required libraries for training the YOLO model. We wi
 
 ## Download the VOC Dataset
 
-Next, we will start with download the VOC dataset.
+Next, we will start with download the VOC dataset. We define the `data_dict` dictionary with the path to the VOC dataset and the names of the classes.
 
 ```python
+import os
 data_dict = {'path': os.path.abspath('./datasets/VOC'),
              'train': ['images/train2012', 'images/train2007', 'images/val2012', 'images/val2007'],
              'val': ['images/test2007'], 'test': ['images/test2007'],
              'names': {0: 'aeroplane', 1: 'bicycle', 2: 'bird', 3: 'boat', 4: 'bottle', 5: 'bus', 6: 'car', 7: 'cat',
                        8: 'chair', 9: 'cow', 10: 'diningtable', 11: 'dog', 12: 'horse', 13: 'motorbike', 14: 'person',
                        15: 'pottedplant', 16: 'sheep', 17: 'sofa', 18: 'train', 19: 'tvmonitor'}}
+```
 
-data_dict["train"] = [os.path.abspath(os.path.join(data_dict["path"], p)) for p in data_dict["train"]]
-data_dict["val"] = [os.path.abspath(os.path.join(data_dict["path"], p)) for p in data_dict["val"]]
+And then we will download the VOC dataset.
 
-data = check_dataset(data_dict)
+```python
+import torch
+import tarfile
 
-train_path, val_path = data["train"], data["val"]
-nc, names = len(data["names"]), data["names"]
+# Download
+dir = Path(data_dict['path'])  # dataset root dir
+dir.mkdir(parents=True, exist_ok=True)  # create dir
+(dir / 'images').mkdir(parents=True, exist_ok=True)  # create dir
+
+urls = ['http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCtrainval_06-Nov-2007.tar',  # 446MB, 5012 images
+        'http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCtest_06-Nov-2007.tar',  # 438MB, 4953 images
+        'http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar']  # 1.95GB, 17126 images
+# download(urls, dir=dir / 'images', delete=False, curl=True, threads=3)
+for url in urls:
+    torch.hub.download_url_to_file(url, dir / 'images' / url.split('/')[-1], progress=False)
+
+# Extract
+for file in dir.glob('images/*.tar'):
+    dir.mkdir(exist_ok=True, parents=True)  # create dir
+    print(f'Extracting {file}...')
+    tar = tarfile.open(file)
+    tar.extractall(dir / 'images')
+    tar.close()
+    file.unlink()  # delete tar after extraction
+```
+
+## Convert the VOC Dataset to YOLO Format
+
+Next, we will convert the VOC dataset to the YOLO format.
+
+```python
+import xml.etree.ElementTree as ET
+from tqdm import tqdm
+
+def convert_label(path, lb_path, year, image_id):
+    def convert_box(size, box):
+        dw, dh = 1. / size[0], 1. / size[1]
+        x, y, w, h = (box[0] + box[1]) / 2.0 - 1, (box[2] + box[3]) / 2.0 - 1, box[1] - box[0], box[3] - box[2]
+        return x * dw, y * dh, w * dw, h * dh
+
+    in_file = open(path / f'VOC{year}/Annotations/{image_id}.xml')
+    out_file = open(lb_path, 'w')
+    tree = ET.parse(in_file)
+    root = tree.getroot()
+    size = root.find('size')
+    w = int(size.find('width').text)
+    h = int(size.find('height').text)
+
+    names = list(data_dict['names'].values())
+    for obj in root.iter('object'):
+        cls = obj.find('name').text
+        if cls in names and int(obj.find('difficult').text) != 1:
+            xmlbox = obj.find('bndbox')
+            bb = convert_box((w, h), [float(xmlbox.find(x).text) for x in ('xmin', 'xmax', 'ymin', 'ymax')])
+            cls_id = names.index(cls)  # class id
+            out_file.write(" ".join([str(a) for a in (cls_id, *bb)]) + '\n')
+
+# Convert
+path = dir / 'images/VOCdevkit'
+for year, image_set in ('2012', 'train'), ('2012', 'val'), ('2007', 'train'), ('2007', 'val'), ('2007', 'test'):
+    imgs_path = dir / 'images' / f'{image_set}{year}'
+    lbs_path = dir / 'labels' / f'{image_set}{year}'
+    imgs_path.mkdir(exist_ok=True, parents=True)
+    lbs_path.mkdir(exist_ok=True, parents=True)
+
+    with open(path / f'VOC{year}/ImageSets/Main/{image_set}.txt') as f:
+        image_ids = f.read().strip().split()
+    for id in tqdm(image_ids, desc=f'{image_set}{year}'):
+        f = path / f'VOC{year}/JPEGImages/{id}.jpg'  # old img path
+        lb_path = (lbs_path / f.name).with_suffix('.txt')  # new label path
+        f.rename(imgs_path / f.name)  # move image
+        convert_label(path, lb_path, year, id)  # convert labels to YOLO format
 ```
 
 ## Define hyperparameters and training settings
@@ -153,6 +222,9 @@ nc, names = len(data["names"]), data["names"]
 Next, we will define the hyperparameters and training settings for training the YOLO model. We will use the hyperparameters and training settings from the YOLOv5 model. We will define the hyperparameters and training settings as a dictionary and pass it to the `train` method of the YOLO model.
 
 ```python
+from yolov5.utils.general import check_dataset
+
+data = check_dataset(data_dict)
 
 train_path, val_path = data["train"], data["val"]
 nc, names = len(data["names"]), data["names"]
@@ -177,7 +249,7 @@ cfg = {'nc': nc, 'depth_multiple': 0.33, 'width_multiple': 0.25,
                 [-1, 3, 'C3', [1024, False]], [[17, 20, 23], 1, 'Detect', ['nc', 'anchors']]]}
 
 device = "cuda"
-epochs = 300
+num_epochs = 1
 batch_size = 4
 img_size = 640
 ```
@@ -227,8 +299,6 @@ Finally, we will train the YOLO model on the VOC dataset. We will use the `train
 
 ```python
 from tqdm import tqdm
-
-num_epochs = 1
 
 model.train()
 model.to(device)
