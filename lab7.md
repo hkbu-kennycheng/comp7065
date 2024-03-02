@@ -90,9 +90,14 @@ results.show()
 
 Next, we will detect objects in the videos using the pre-trained YOLO model. We will make use of `supervision` package to process the video and detect objects in the video. The `supervision` package provides a convenient way to process the video and detect objects in the video. We will use the `supervision` package to process the video and detect objects in the video.
 
+```juypyter
+!pip install supervision
+```
+
 ```python
 import supervision as sv
 import numpy as np
+import torch
 
 video_path = 'car_chase_01.mp4'
 torch.hub.download_url_to_file('https://github.com/dannylee1020/object-detection-video/raw/master/videos/car_chase_01.mp4', video_path, progress=False)
@@ -124,7 +129,7 @@ In this section, we will go through the process of training the YOLO model on a 
 
 First, we will install the required libraries for training the YOLO model. We will use the `pip` package manager to install the required libraries. We will install the `yolov5` package, which contains the YOLOv5 model and the required utilities for training the model. We will also install the `pycocotools` package, which contains the COCO dataset and the required utilities for training the model.
 
-```python
+```juypyter
 !pip install yolov5 pycocotools
 ```
 
@@ -147,6 +152,7 @@ And then we will download the VOC dataset.
 ```python
 import torch
 import tarfile
+from pathlib import Path
 
 # Download
 dir = Path(data_dict['path'])  # dataset root dir
