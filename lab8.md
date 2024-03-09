@@ -269,7 +269,7 @@ hubmodel = torch.hub.load('ultralytics/yolov5', 'yolov5n', pretrained=True, verb
 
 model.eval()
 # swap in our trained model
-hubmodel.model = model
+hubmodel.model.model = model
 
 pbar = tqdm(val_loader, position=0, leave=True)
 for (imgs, targets, paths, _) in pbar:
