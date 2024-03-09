@@ -241,7 +241,7 @@ for epoch in range(num_epochs):
 
         pbar.set_description(f"Epoch [{epoch}/{num_epochs}]")
         pbar.set_postfix(loss=loss.item(), running_loss=running_loss)
-    model.load_state_dict(torch.load('yolov5n_voc.pth'))
+    torch.save(model.state_dict(), 'yolov5n_voc.pth')
 ```
 
 ## Construct the DataLoader for the validation dataset
