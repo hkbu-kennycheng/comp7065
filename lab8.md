@@ -213,6 +213,37 @@ import torch
 model.load_state_dict(torch.load('yolov5n_voc.pth'))
 ```
 
+## Continue training the YOLO model
+
+Next, we will continue training the YOLO model with the validation dataset. We will use the DataLoader to load the images and labels from the validation dataset and pass them to the YOLO model for training.
+
+```python
+from tqdm import tqdm
+
+model.train()
+model.to(device)
+
+for epoch in range(num_epochs):
+    pbar = tqdm(train_loader, position=0, leave=True)
+    running_loss = 0.0
+    for (imgs, targets, paths, _) in pbar:
+        # Forward pass
+        imgs = imgs.to(device).float() / 255
+        pred = model(imgs)
+        loss, loss_items = compute_loss(pred, targets.to(device))
+        
+        # Backward pass
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        running_loss += loss.item()
+
+        pbar.set_description(f"Epoch [{epoch}/{num_epochs}]")
+        pbar.set_postfix(loss=loss.item(), running_loss=running_loss)
+    model.load_state_dict(torch.load('yolov5n_voc.pth'))
+```
+
 ## Construct the DataLoader for the validation dataset
 
 Next, we will construct the DataLoader for the validation dataset. We will use the `DataLoader` class from the `torch.utils.data` module to construct the DataLoader for the validation dataset. We will use the DataLoader to load the images and labels from the validation dataset and pass them to the YOLO model for evaluation.
@@ -227,26 +258,6 @@ val_loader, dataset = create_dataloader(
     augment=True,
     shuffle=True,
 )
-```
-
-## Evaluate the performance of the YOLO model with the validation dataset
-
-Next, we will evaluate the performance of the YOLO model with the validation dataset. We will use the `evaluate` method of the YOLO model to evaluate the performance of the YOLO model with the validation dataset.
-
-```python
-model.eval()
-
-pbar = tqdm(val_loader, position=0, leave=True)
-running_loss = 0.0
-for (imgs, targets, paths, _) in pbar:
-    # Forward pass
-    imgs = imgs.to(device).float() / 255
-    pred = model(imgs)
-    loss, loss_items = compute_loss(pred, targets.to(device))
-    running_loss += loss.item()
-
-    pbar.set_description(f"Epoch [{epoch}/{num_epochs}]")
-    pbar.set_postfix(loss=running_loss)
 ```
 
 ## Make predictions with the YOLO model
