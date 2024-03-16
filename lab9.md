@@ -489,7 +489,7 @@ for epoch in range(NUM_EPOCHS):
     model.to(dev)
     output = model.forward(batch.to(dev))
 
-    loss = loss_function(output.to(dev), labels.to(dev))
+    loss = loss_function(output, labels)
     loss.to(dev)
     loss.backward()
 
@@ -732,7 +732,7 @@ for epoch in range(NUM_EPOCHS):
     model.to(dev)
     output = model.forward(batch.to(dev))
 
-    loss = loss_function(output.to(dev), labels.to(dev), torch.ones(output.shape).to(dev))
+    loss = loss_function(output, labels, torch.ones(output.shape).to(dev))
     loss.to(dev)
     loss.backward()
 
