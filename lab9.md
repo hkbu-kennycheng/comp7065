@@ -1,4 +1,4 @@
-# Lab 5: Recurrent neural network (RNN)
+# Lab 9: Recurrent neural network (RNN)
 
 ---
 
