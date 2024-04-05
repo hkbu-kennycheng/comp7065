@@ -207,5 +207,5 @@ for i, text in enumerate(output):
 
 Let's try to fine-tune the GPT-2 model on Harry Potter books dataset and generate text based on a given prompt. You could download the data from the following link and combine them into a single dataset with your custom Dataset and DataLoader.
 
-- (https://github.com/gastonstat/harry-potter-data)[https://github.com/gastonstat/harry-potter-data]
-- (https://nuochenpku.github.io/HPD.github.io/download)[https://nuochenpku.github.io/HPD.github.io/download]
+- [https://github.com/gastonstat/harry-potter-data](https://github.com/gastonstat/harry-potter-data)
+- [https://nuochenpku.github.io/HPD.github.io/download](https://nuochenpku.github.io/HPD.github.io/download)
