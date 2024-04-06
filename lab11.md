@@ -128,6 +128,8 @@ EPOCHS = 5 # Change this value based on the number of epochs you want to train
 LEARNING_RATE = 3e-5 # Change this value based on the learning rate you want to use
 WARMUP_STEPS = 500 # Change this value based on the number of warmup steps you want to use
 MAX_SEQ_LEN = 128 # Change this value based on the maximum sequence length you want to use
+
+model = generator.model # Use the pre-trained GPT-2 model directly
 ```
 
 ## Dataset
