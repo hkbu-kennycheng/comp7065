@@ -132,6 +132,17 @@ MAX_SEQ_LEN = 128 # Change this value based on the maximum sequence length you w
 model = generator.model # Use the pre-trained GPT-2 model directly
 ```
 
+## Tokenizer
+
+We will use the GPT-2 tokenizer to encode the text data into tokens that can be fed into the model.
+
+```python
+from transformers import GPT2Tokenizer
+
+tokenizer = GPT2Tokenizer.from_pretrained(model_id)
+tokenizer.pad_token = tokenizer.eos_token
+```
+
 ## Dataset
 
 For this case study, we will use a dataset of Github code snippets. The dataset contains code snippets from various programming languages, such as Python, Java, and JavaScript. We will fine-tune the GPT-2 model on this dataset to generate code snippets based on a given prompt.
